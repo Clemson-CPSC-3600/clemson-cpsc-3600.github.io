@@ -1,0 +1,36 @@
+{
+  "title": "Network Latency Practice Problems",
+  "description": "Interactive practice problems for learning network latency calculations with immediate feedback",
+  "keywords": [
+    "network latency",
+    "transmission delay",
+    "propagation delay",
+    "processing delay",
+    "queuing delay",
+    "practice problems",
+    "interactive learning"
+  ],
+  "difficulty": "beginner",
+  "prerequisites": [
+    "basic-networking",
+    "latency-concepts"
+  ],
+  "estimatedTime": "30-45 minutes",
+  "category": "practice",
+  "order": 2,
+  "features": [
+    "10+ hand-crafted problems",
+    "Progressive hint system",
+    "Immediate feedback",
+    "Visual network diagrams",
+    "Score tracking",
+    "Solution explanations"
+  ],
+  "learningObjectives": [
+    "Calculate transmission delay for different packet sizes and bandwidths",
+    "Calculate propagation delay based on distance and medium",
+    "Understand processing and queuing delays",
+    "Identify bottlenecks in multi-hop networks",
+    "Apply latency concepts to real-world scenarios"
+  ]
+}

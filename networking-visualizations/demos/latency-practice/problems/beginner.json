@@ -1,0 +1,391 @@
+[
+  {
+    "id": "beginner-001",
+    "type": "calculate-total",
+    "difficulty": "beginner",
+    "title": "Home WiFi Connection",
+    "scenario": "You're connecting your laptop to your home router via WiFi. The router is in the next room, about 10 meters away. Calculate the total latency for sending a standard 1500-byte packet.",
+    "given": {
+      "hops": [
+        {
+          "name": "Laptop to Router",
+          "bandwidth": 100000000,
+          "distance": 10,
+          "medium": "wifi",
+          "processingDelay": 0.1,
+          "queuingDelay": 0.24
+        }
+      ],
+      "packetSize": 1500,
+      "propagationSpeed": {
+        "wifi": 200000000,
+        "fiber": 200000000,
+        "copper": 200000000
+      }
+    },
+    "question": "Calculate the total latency for this single-hop connection. Processing and queuing delays are given.",
+    "tolerance": 0.05,
+    "hints": [
+      "Transmission delay = (packet size in bits) ÷ bandwidth",
+      "1500 bytes × 8 = 12,000 bits. Then 12,000 ÷ 100,000,000 = 0.00012 seconds = 0.12 ms",
+      "Propagation delay = distance ÷ speed = 10m ÷ 200,000,000 m/s = 0.00000005 s ≈ 0 ms",
+      "Total = Transmission (0.12) + Propagation (0) + Processing (0.1) + Queuing (0.24) = 0.46 ms"
+    ]
+  },
+  {
+    "id": "beginner-002",
+    "type": "calculate-total",
+    "difficulty": "beginner",
+    "title": "Ethernet Cable Connection",
+    "scenario": "Your desktop PC is connected to your router with a 5-meter Ethernet cable. The connection runs at Gigabit speeds. Calculate the latency for a small 64-byte ping packet.",
+    "given": {
+      "hops": [
+        {
+          "name": "PC to Router",
+          "bandwidth": 1000000000,
+          "distance": 5,
+          "medium": "copper",
+          "processingDelay": 0.1,
+          "queuingDelay": 0
+        }
+      ],
+      "packetSize": 64,
+      "propagationSpeed": {
+        "copper": 200000000
+      }
+    },
+    "question": "What is the total latency for this wired connection? No queuing occurs.",
+    "tolerance": 0.01,
+    "hints": [
+      "Transmission: 64 bytes = 512 bits",
+      "512 bits ÷ 1,000,000,000 bps = 0.000000512 seconds = 0.000512 ms",
+      "Propagation: 5m ÷ 200,000,000 m/s ≈ 0 ms (negligible)",
+      "Total = 0.000512 + 0 + 0.1 + 0 ≈ 0.1005 ms"
+    ]
+  },
+  {
+    "id": "beginner-003",
+    "type": "calculate-total",
+    "difficulty": "beginner",
+    "title": "Gaming to Local Server",
+    "scenario": "You're gaming on a server located at your ISP, 50km away. You have a fiber connection with 500 Mbps speed. Game packets are 256 bytes.",
+    "given": {
+      "hops": [
+        {
+          "name": "PC to Router",
+          "bandwidth": 1000000000,
+          "distance": 2,
+          "medium": "copper",
+          "processingDelay": 0.1,
+          "queuingDelay": 0.05
+        },
+        {
+          "name": "Router to ISP",
+          "bandwidth": 500000000,
+          "distance": 50000,
+          "medium": "fiber",
+          "processingDelay": 0.5,
+          "queuingDelay": 0.2
+        }
+      ],
+      "packetSize": 256,
+      "propagationSpeed": {
+        "copper": 200000000,
+        "fiber": 200000000
+      }
+    },
+    "question": "Calculate the end-to-end latency for your game packets.",
+    "tolerance": 0.1,
+    "hints": [
+      "Calculate each hop separately then sum them",
+      "Hop 1: Trans=(256×8)÷1Gbps=0.002ms, Prop=2÷200M≈0ms, Proc=0.1ms, Queue=0.05ms",
+      "Hop 2: Trans=(256×8)÷500Mbps=0.004ms, Prop=50000÷200M=0.25ms, Proc=0.5ms, Queue=0.2ms",
+      "Total = 0.002 + 0 + 0.1 + 0.05 + 0.004 + 0.25 + 0.5 + 0.2 = 1.106 ms"
+    ]
+  },
+  {
+    "id": "beginner-004",
+    "type": "calculate-total",
+    "difficulty": "beginner",
+    "title": "Video Call Across Campus",
+    "scenario": "You're on a video call with someone 500m away on campus. Buildings are connected via fiber at 10 Gbps. Video packets are 1200 bytes.",
+    "given": {
+      "hops": [
+        {
+          "name": "Your Building",
+          "bandwidth": 1000000000,
+          "distance": 100,
+          "medium": "copper",
+          "processingDelay": 0.002,
+          "queuingDelay": 0.06
+        },
+        {
+          "name": "Campus Backbone",
+          "bandwidth": 10000000000,
+          "distance": 300,
+          "medium": "fiber",
+          "processingDelay": 0.01,
+          "queuingDelay": 0.08
+        },
+        {
+          "name": "Other Building",
+          "bandwidth": 1000000000,
+          "distance": 100,
+          "medium": "copper",
+          "processingDelay": 0.002,
+          "queuingDelay": 0.06
+        }
+      ],
+      "packetSize": 1200,
+      "propagationSpeed": {
+        "copper": 200000000,
+        "fiber": 200000000
+      }
+    },
+    "question": "What is the total latency for video packets? Note: switches have very low processing delay.",
+    "tolerance": 0.1,
+    "hints": [
+      "Three hops to calculate",
+      "Hop 1: Trans=1200×8÷1Gbps=0.0096ms, Prop≈0ms, Proc=0.002ms, Queue=0.06ms",
+      "Hop 2: Trans=1200×8÷10Gbps=0.00096ms, Prop=300÷200M=0.0015ms, Proc=0.01ms, Queue=0.08ms",
+      "Hop 3: Same as Hop 1. Total ≈ 0.22 ms"
+    ]
+  },
+  {
+    "id": "beginner-005",
+    "type": "calculate-total",
+    "difficulty": "beginner",
+    "title": "Mobile Hotspot Connection",
+    "scenario": "You're using your phone's 4G hotspot. The cell tower is 2km away. The 4G connection provides 50 Mbps.",
+    "given": {
+      "hops": [
+        {
+          "name": "Laptop to Phone",
+          "bandwidth": 150000000,
+          "distance": 1,
+          "medium": "wifi",
+          "processingDelay": 0.1,
+          "queuingDelay": 0.08
+        },
+        {
+          "name": "Phone to Tower",
+          "bandwidth": 50000000,
+          "distance": 2000,
+          "medium": "wireless",
+          "processingDelay": 2,
+          "queuingDelay": 1.5
+        }
+      ],
+      "packetSize": 1500,
+      "propagationSpeed": {
+        "wifi": 200000000,
+        "wireless": 300000000
+      }
+    },
+    "question": "Calculate the total latency through the mobile hotspot. Note the higher delays in cellular networks.",
+    "tolerance": 0.2,
+    "hints": [
+      "Two hops with different characteristics",
+      "Hop 1: Trans=1500×8÷150Mbps=0.08ms, Prop≈0ms, Proc=0.1ms, Queue=0.08ms",
+      "Hop 2: Trans=1500×8÷50Mbps=0.24ms, Prop=2000÷300M=0.0067ms, Proc=2ms, Queue=1.5ms",
+      "Total = 0.08 + 0 + 0.1 + 0.08 + 0.24 + 0.007 + 2 + 1.5 = 4.007 ms"
+    ]
+  },
+  {
+    "id": "beginner-006",
+    "type": "calculate-total",
+    "difficulty": "beginner",
+    "title": "Streaming from CDN",
+    "scenario": "Your smart TV is streaming from a CDN server 100km away via WiFi and fiber.",
+    "given": {
+      "hops": [
+        {
+          "name": "TV to Router",
+          "bandwidth": 300000000,
+          "distance": 8,
+          "medium": "wifi",
+          "processingDelay": 0.15,
+          "queuingDelay": 0.5
+        },
+        {
+          "name": "Router to CDN",
+          "bandwidth": 200000000,
+          "distance": 100000,
+          "medium": "fiber",
+          "processingDelay": 0.3,
+          "queuingDelay": 0.8
+        }
+      ],
+      "packetSize": 1500,
+      "propagationSpeed": {
+        "wifi": 200000000,
+        "fiber": 200000000
+      }
+    },
+    "question": "What is the latency for streaming packets? Standard MTU size of 1500 bytes.",
+    "tolerance": 0.2,
+    "hints": [
+      "Standard packet size means moderate transmission delay",
+      "Hop 1: Trans=1500×8÷300Mbps=0.04ms, Prop=8÷200M≈0ms, Proc=0.15ms, Queue=0.5ms",
+      "Hop 2: Trans=1500×8÷200Mbps=0.06ms, Prop=100km÷200M=0.5ms, Proc=0.3ms, Queue=0.8ms",
+      "Total = 0.04 + 0 + 0.15 + 0.5 + 0.06 + 0.5 + 0.3 + 0.8 = 2.35 ms"
+    ]
+  },
+  {
+    "id": "beginner-007",
+    "type": "calculate-total",
+    "difficulty": "beginner",
+    "title": "Office LAN Transfer",
+    "scenario": "Transferring files to a colleague in the same office via gigabit Ethernet switches.",
+    "given": {
+      "hops": [
+        {
+          "name": "Your PC to Switch",
+          "bandwidth": 1000000000,
+          "distance": 50,
+          "medium": "copper",
+          "processingDelay": 0.002,
+          "queuingDelay": 0.03
+        },
+        {
+          "name": "Switch to Colleague",
+          "bandwidth": 1000000000,
+          "distance": 50,
+          "medium": "copper",
+          "processingDelay": 0.002,
+          "queuingDelay": 0.03
+        }
+      ],
+      "packetSize": 1500,
+      "propagationSpeed": {
+        "copper": 200000000
+      }
+    },
+    "question": "Calculate the LAN latency. Switches have microsecond-level processing delays.",
+    "tolerance": 0.05,
+    "hints": [
+      "Gigabit on both hops means fast transmission",
+      "Each hop: Trans=1500×8÷1Gbps=0.012ms, Prop=50÷200M≈0ms",
+      "Processing is 0.002ms (2 microseconds) per switch",
+      "Total = 2×(0.012 + 0 + 0.002 + 0.03) = 0.088 ms"
+    ]
+  },
+  {
+    "id": "beginner-008",
+    "type": "calculate-total",
+    "difficulty": "beginner",
+    "title": "Cloud Backup Upload",
+    "scenario": "Backing up files to a cloud datacenter 200km away with 100 Mbps upload speed.",
+    "given": {
+      "hops": [
+        {
+          "name": "Home to ISP",
+          "bandwidth": 100000000,
+          "distance": 5000,
+          "medium": "fiber",
+          "processingDelay": 0.5,
+          "queuingDelay": 0.6
+        },
+        {
+          "name": "ISP to Datacenter",
+          "bandwidth": 10000000000,
+          "distance": 195000,
+          "medium": "fiber",
+          "processingDelay": 0.05,
+          "queuingDelay": 0.3
+        }
+      ],
+      "packetSize": 1400,
+      "propagationSpeed": {
+        "fiber": 200000000
+      }
+    },
+    "question": "What is the upload latency to the cloud?",
+    "tolerance": 0.2,
+    "hints": [
+      "Your 100 Mbps upload is the bottleneck",
+      "Hop 1: Trans=1400×8÷100Mbps=0.112ms, Prop=5km÷200M=0.025ms",
+      "Hop 2: Trans=1400×8÷10Gbps=0.00112ms, Prop=195km÷200M=0.975ms",
+      "Total = 0.112 + 0.025 + 0.5 + 0.6 + 0.001 + 0.975 + 0.05 + 0.3 = 2.563 ms"
+    ]
+  },
+  {
+    "id": "beginner-009",
+    "type": "calculate-total",
+    "difficulty": "beginner",
+    "title": "IoT Sensor Network",
+    "scenario": "An IoT sensor sends small packets through a gateway to a local server.",
+    "given": {
+      "hops": [
+        {
+          "name": "Sensor to Gateway",
+          "bandwidth": 54000000,
+          "distance": 20,
+          "medium": "wifi",
+          "processingDelay": 0.08,
+          "queuingDelay": 0
+        },
+        {
+          "name": "Gateway to Server",
+          "bandwidth": 100000000,
+          "distance": 100,
+          "medium": "copper",
+          "processingDelay": 0.05,
+          "queuingDelay": 0.02
+        }
+      ],
+      "packetSize": 128,
+      "propagationSpeed": {
+        "wifi": 200000000,
+        "copper": 200000000
+      }
+    },
+    "question": "Calculate latency for small IoT packets. Minimal queuing due to low traffic.",
+    "tolerance": 0.05,
+    "hints": [
+      "Small packets mean low transmission delay",
+      "Hop 1: Trans=128×8÷54Mbps=0.019ms, Prop=20÷200M≈0ms",
+      "Hop 2: Trans=128×8÷100Mbps=0.01ms, Prop=100÷200M≈0ms",
+      "Total = 0.019 + 0 + 0.08 + 0 + 0.01 + 0 + 0.05 + 0.02 = 0.179 ms"
+    ]
+  },
+  {
+    "id": "beginner-010",
+    "type": "calculate-total",
+    "difficulty": "beginner",
+    "title": "Simple Two-Hop Path",
+    "scenario": "A simple network path with clear parameters for practice.",
+    "given": {
+      "hops": [
+        {
+          "name": "Hop 1",
+          "bandwidth": 100000000,
+          "distance": 1000,
+          "medium": "fiber",
+          "processingDelay": 0.2,
+          "queuingDelay": 0.3
+        },
+        {
+          "name": "Hop 2",
+          "bandwidth": 1000000000,
+          "distance": 10000,
+          "medium": "fiber",
+          "processingDelay": 0.1,
+          "queuingDelay": 0.15
+        }
+      ],
+      "packetSize": 1000,
+      "propagationSpeed": {
+        "fiber": 200000000
+      }
+    },
+    "question": "Calculate the total end-to-end latency.",
+    "tolerance": 0.05,
+    "hints": [
+      "Work through each component systematically",
+      "Hop 1: Trans=1000×8÷100M=0.08ms, Prop=1km÷200M=0.005ms, Proc=0.2ms, Queue=0.3ms",
+      "Hop 2: Trans=1000×8÷1G=0.008ms, Prop=10km÷200M=0.05ms, Proc=0.1ms, Queue=0.15ms",
+      "Total = 0.08 + 0.005 + 0.2 + 0.3 + 0.008 + 0.05 + 0.1 + 0.15 = 0.893 ms"
+    ]
+  }
+]

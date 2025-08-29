@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Practice solving network latency problems with immediate feedback">
+  <title>Latency Practice Problems - Interactive Network Learning</title>
+  
+  <link rel="stylesheet" href="../../shared/styles/main.css">
+  <link rel="stylesheet" href="./styles/practice.css">
+</head>
+<body>
+  <main>
+    <div class="practice-container">
+      <header class="practice-header">
+        <h1>Network Latency Practice</h1>
+        <div class="stats-bar">
+          <div class="stat">
+            <span class="stat-label">Score:</span>
+            <span class="stat-value" id="score">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Streak:</span>
+            <span class="stat-value" id="streak">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Accuracy:</span>
+            <span class="stat-value" id="accuracy">--%</span>
+          </div>
+        </div>
+      </header>
+      
+      <div class="practice-layout">
+        <!-- Left sidebar with problem selection -->
+        <aside class="problem-sidebar">
+          <h2>Problems</h2>
+          <div class="problem-selector">
+            <select id="problem-select" class="problem-dropdown">
+              <option value="">Select a problem...</option>
+            </select>
+          </div>
+          
+          <div class="problem-filters">
+            <h3>Difficulty</h3>
+            <label class="filter-option">
+              <input type="radio" name="difficulty" value="all" checked>
+              <span>All Levels</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="difficulty" value="beginner">
+              <span>Beginner</span>
+            </label>
+            <label class="filter-option">
+              <input type="radio" name="difficulty" value="intermediate">
+              <span>Intermediate</span>
+            </label>
+          </div>
+          
+          <div class="progress-section">
+            <h3>Your Progress</h3>
+            <div id="progress-display" class="progress-display">
+              <div class="progress-item">
+                <span>Problems Solved:</span>
+                <span id="problems-solved">0</span>
+              </div>
+              <div class="progress-item">
+                <span>Average Time:</span>
+                <span id="avg-time">--</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="formula-reference">
+            <h3>📐 Formula Reference</h3>
+            <div class="formula-list">
+              <div class="formula-item">
+                <strong>Transmission Delay</strong>
+                <code>L / R</code>
+                <small>L = packet size (bits)<br>R = bandwidth (bps)</small>
+              </div>
+              <div class="formula-item">
+                <strong>Propagation Delay</strong>
+                <code>d / s</code>
+                <small>d = distance (m)<br>s = speed (m/s)</small>
+              </div>
+              <div class="formula-item">
+                <strong>Processing Delay</strong>
+                <small>Given in problem</small>
+              </div>
+              <div class="formula-item">
+                <strong>Queuing Delay</strong>
+                <small>Given in problem</small>
+              </div>
+              <div class="formula-item" style="border-top: 1px solid #e0e6ed; padding-top: 0.5rem; margin-top: 0.5rem;">
+                <strong>Total Latency</strong>
+                <code>Σ(Trans + Prop + Proc + Queue)</code>
+              </div>
+            </div>
+          </div>
+        </aside>
+        
+        <!-- Main problem area -->
+        <section class="problem-area">
+          <div id="problem-display" class="problem-display">
+            <div class="welcome-message">
+              <h2>Welcome to Latency Practice!</h2>
+              <p>Select a problem from the sidebar to begin practicing network latency calculations.</p>
+              <p>You'll learn to calculate:</p>
+              <ul>
+                <li>📡 Transmission Delay - Time to push bits onto the wire</li>
+                <li>🌍 Propagation Delay - Time for signal to travel the distance</li>
+                <li>⚙️ Processing Delay - Time for routers to process packets</li>
+                <li>🚦 Queuing Delay - Time waiting in router queues</li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Network visualization -->
+          <div id="visualization-container" class="visualization-container" style="display: none;">
+            <canvas id="network-canvas"></canvas>
+          </div>
+          
+          <!-- Answer input area -->
+          <div id="answer-area" class="answer-area" style="display: none;">
+            <h3>Your Solution</h3>
+            <div class="answer-grid">
+              <div class="answer-component">
+                <label for="transmission-input">Transmission Delay (ms):</label>
+                <input type="number" id="transmission-input" step="0.001" min="0">
+              </div>
+              <div class="answer-component">
+                <label for="propagation-input">Propagation Delay (ms):</label>
+                <input type="number" id="propagation-input" step="0.001" min="0">
+              </div>
+              <div class="answer-component">
+                <label for="processing-input">Processing Delay (ms):</label>
+                <input type="number" id="processing-input" step="0.001" min="0">
+              </div>
+              <div class="answer-component">
+                <label for="queuing-input">Queuing Delay (ms):</label>
+                <input type="number" id="queuing-input" step="0.001" min="0">
+              </div>
+            </div>
+            
+            <div class="total-display">
+              <label>Total Latency (ms):</label>
+              <input type="number" id="total-input" step="0.001" min="0" readonly>
+            </div>
+            
+            <div class="action-buttons">
+              <button id="check-answer" class="btn btn-primary">Check Answer</button>
+              <button id="get-hint" class="btn btn-secondary">Get Hint</button>
+              <button id="show-solution" class="btn btn-secondary">Show Solution</button>
+              <button id="next-problem" class="btn btn-success" style="display: none;">Next Problem</button>
+            </div>
+          </div>
+          
+          <!-- Feedback area -->
+          <div id="feedback-area" class="feedback-area" style="display: none;">
+            <h3>Feedback</h3>
+            <div id="feedback-content" class="feedback-content"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
