@@ -11,68 +11,6 @@ export class NetworkHop {
     this.setDefaults();
   }
   
-  setQueueDefaults() {
-    // Set queue parameters based on hop type
-    switch(this.type) {
-      case 'client':
-        // Home devices: light traffic, small buffers
-        this.queue = {
-          currentDepth: 2,
-          bufferSize: 50,
-          arrivalRate: 10,    // 10 packets/sec
-          serviceRate: 100    // Can handle 100 packets/sec
-        };
-        break;
-        
-      case 'isp-edge':
-        // ISP edge: moderate congestion possible
-        this.queue = {
-          currentDepth: 5,
-          bufferSize: 200,
-          arrivalRate: 80,    // 80 packets/sec (busy)
-          serviceRate: 100    // 100 packets/sec capacity
-        };
-        break;
-        
-      case 'router':
-        // Regular routers: moderate traffic
-        this.queue = {
-          currentDepth: 3,
-          bufferSize: 150,
-          arrivalRate: 40,    // 40 packets/sec
-          serviceRate: 100    // 100 packets/sec
-        };
-        break;
-        
-      case 'core':
-        // Core routers: high capacity, well-provisioned
-        this.queue = {
-          currentDepth: 1,
-          bufferSize: 500,
-          arrivalRate: 200,   // High traffic
-          serviceRate: 1000   // But very high capacity
-        };
-        break;
-        
-      case 'server':
-        // Servers: depends on load
-        this.queue = {
-          currentDepth: 4,
-          bufferSize: 100,
-          arrivalRate: 30,    // Moderate requests
-          serviceRate: 50     // Processing capacity
-        };
-        break;
-        
-      default:
-        this.queue = {
-          currentDepth: 2,
-          bufferSize: 100,
-          arrivalRate: 20,
-          serviceRate: 100
-        };
-    }
-  }
   
   setDefaults() {
     switch(this.type) {
@@ -159,9 +97,6 @@ export class NetworkHop {
           currentLoad: 0.3
         };
     }
-    
-    // Queue properties - vary by hop type for realism
-    this.setQueueDefaults();
   }
   
   /**
@@ -174,7 +109,7 @@ export class NetworkHop {
       transmission: this.calculateTransmission(packetSizeBytes),
       propagation: this.calculatePropagation(),
       processing: this.calculateProcessing(),
-      queuing: this.calculateQueuing()
+      queuing: this.calculateQueuing(packetSizeBytes)
     };
     
     // Calculate total for this hop
@@ -257,14 +192,14 @@ export class NetworkHop {
   
   /**
    * Queuing Delay: Time spent waiting in queue before processing
-   * Using simplified formula: (1/(1-x)³) - 1 where x is utilization
+   * Using simplified formula: (1/(1-x)³) - 1 where x is link utilization
    * Result is directly in milliseconds per packet
    */
-  calculateQueuing() {
-    // Calculate utilization (x = arrival rate / service rate)
-    const utilization = this.queue.arrivalRate / this.queue.serviceRate;
+  calculateQueuing(packetSizeBytes = 1500) {
+    // Use link utilization directly
+    const utilization = this.link.utilization;
     
-    // If queue is unstable (arrival >= service), return high delay
+    // If queue is unstable (utilization >= 95%), return high delay
     if (utilization >= 0.95) {
       return 100; // 100ms max queuing delay
     }
@@ -302,7 +237,8 @@ export class NetworkHop {
       bandwidth: `${(this.link.bandwidth / 1_000_000).toFixed(0)} Mbps`,
       distance: `${this.link.distance} km`,
       medium: this.link.medium,
-      load: `${(this.device.currentLoad * 100).toFixed(0)}%`
+      load: `${(this.device.currentLoad * 100).toFixed(0)}%`,
+      utilization: `${(this.link.utilization * 100).toFixed(0)}%`
     };
   }
 }

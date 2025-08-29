@@ -1,9 +1,11 @@
 import { NetworkPath } from './js/NetworkPath.js';
 import { PacketJourneyVisualization } from './js/Visualization.js';
+import { HopControls } from './js/Controls.js';
 
 // Global instances
 let networkPath;
 let visualization;
+let hopControls;
 let currentLatencyData = null;
 
 /**
@@ -16,14 +18,42 @@ function init() {
   // Create visualization
   visualization = new PacketJourneyVisualization('network-canvas');
   
+  // Create hop controls (but don't display them)
+  hopControls = new HopControls(networkPath, () => {
+    calculateAndDisplay();
+  });
+  
+  // Don't insert hop controls into the page
+  // insertHopControls();
+  
   // Set up event listeners
   setupEventListeners();
   
-  // Initial render
-  visualization.renderPath(networkPath);
+  // Calculate initial latency (this will also render the path)
+  performCalculation();
+}
+
+/**
+ * Insert hop controls into the DOM
+ */
+function insertHopControls() {
+  // Find or create container for hop controls
+  let controlsContainer = document.getElementById('hop-controls-section');
+  if (!controlsContainer) {
+    // Create it after the suitable apps panel
+    const suitableApps = document.getElementById('suitable-apps');
+    if (suitableApps) {
+      controlsContainer = document.createElement('div');
+      controlsContainer.id = 'hop-controls-section';
+      controlsContainer.className = 'hop-controls-section';
+      suitableApps.parentNode.insertBefore(controlsContainer, suitableApps.nextSibling);
+    }
+  }
   
-  // Calculate initial latency
-  calculateAndDisplay();
+  if (controlsContainer) {
+    controlsContainer.innerHTML = hopControls.createHopControlsPanel();
+    hopControls.bindEvents(controlsContainer);
+  }
 }
 
 /**
@@ -34,8 +64,8 @@ function setupEventListeners() {
   const presetSelect = document.getElementById('preset-select');
   presetSelect.addEventListener('change', (e) => {
     networkPath.loadPreset(e.target.value);
-    visualization.renderPath(networkPath);
-    calculateAndDisplay();
+    // Automatically calculate with new preset
+    performCalculation(); // Use performCalculation directly to avoid debounce
   });
   
   // Packet size slider
@@ -44,11 +74,9 @@ function setupEventListeners() {
   
   packetSizeSlider.addEventListener('input', (e) => {
     packetSizeValue.textContent = e.target.value;
+    // Automatically recalculate latency when packet size changes
+    calculateAndDisplay();
   });
-  
-  // Calculate button
-  const calculateBtn = document.getElementById('calculate-btn');
-  calculateBtn.addEventListener('click', calculateAndDisplay);
   
   // Handle window resize
   window.addEventListener('resize', () => {
@@ -61,52 +89,66 @@ function setupEventListeners() {
   });
 }
 
+// Debounce timer for auto-calculation
+let calculateDebounceTimer = null;
+
 /**
  * Calculate latency and update display
  */
 function calculateAndDisplay() {
+  // Clear any existing debounce timer
+  if (calculateDebounceTimer) {
+    clearTimeout(calculateDebounceTimer);
+  }
+  
+  // Debounce the calculation for smooth user experience
+  calculateDebounceTimer = setTimeout(() => {
+    performCalculation();
+  }, 150); // Small delay for smooth interaction
+}
+
+/**
+ * Actually perform the calculation
+ */
+function performCalculation() {
   // Get packet size
   const packetSize = parseInt(document.getElementById('packet-size').value);
   
-  // Show loading state
-  const calculateBtn = document.getElementById('calculate-btn');
-  calculateBtn.classList.add('loading');
-  calculateBtn.disabled = true;
+  // Calculate latency
+  currentLatencyData = networkPath.calculateTotalLatency(packetSize);
   
-  // Small delay to show loading state
-  setTimeout(() => {
-    // Calculate latency
-    currentLatencyData = networkPath.calculateTotalLatency(packetSize);
-    
-    // Find bottleneck
-    const bottleneck = networkPath.findBottleneck(packetSize);
-    
-    // Update visualization with latency data
-    visualization.renderPath(networkPath, currentLatencyData);
-    
-    // Update results summary
-    updateResultsSummary(currentLatencyData, bottleneck);
-    
-    // Update component breakdown
-    updateComponentBreakdown(currentLatencyData.components);
-    
-    // Update suitable applications
-    updateSuitableApps(currentLatencyData.summary.suitable);
-    
-    // Update detailed breakdown table
-    updateBreakdownTable(currentLatencyData.breakdown);
-    
-    // Show all result panels
-    document.getElementById('results-summary').style.display = 'block';
-    document.getElementById('component-breakdown').style.display = 'block';
-    document.getElementById('suitable-apps').style.display = 'block';
-    document.getElementById('detailed-breakdown').style.display = 'block';
-    
-    // Remove loading state
-    calculateBtn.classList.remove('loading');
-    calculateBtn.disabled = false;
-  }, 100);
+  // Find bottleneck
+  const bottleneck = networkPath.findBottleneck(packetSize);
+  
+  // Update visualization with latency data
+  visualization.renderPath(networkPath, currentLatencyData);
+  
+  // Update results summary
+  updateResultsSummary(currentLatencyData, bottleneck);
+  
+  // Update component breakdown
+  updateComponentBreakdown(currentLatencyData.components);
+  
+  // Update detailed breakdown table
+  updateBreakdownTable(currentLatencyData.breakdown);
+  
+  // Update hop latency displays in controls
+  if (hopControls) {
+    hopControls.updateLatencyDisplays(currentLatencyData);
+    // Also update the control panel values to reflect any changes from popup
+    for (let i = 0; i < networkPath.hops.length; i++) {
+      hopControls.updateControlDisplays(i);
+    }
+  }
+  
+  // Show all result panels
+  document.getElementById('results-summary').style.display = 'block';
+  document.getElementById('component-breakdown').style.display = 'block';
+  document.getElementById('detailed-breakdown').style.display = 'block';
 }
+
+// Expose calculateAndDisplay to window for popup to use
+window.calculateAndDisplay = calculateAndDisplay;
 
 /**
  * Update the results summary panel
@@ -156,19 +198,7 @@ function updateComponentBreakdown(components) {
     `${components.queuing.toFixed(2)} ms`;
 }
 
-/**
- * Update the suitable applications list
- */
-function updateSuitableApps(apps) {
-  const appsList = document.getElementById('apps-list');
-  appsList.innerHTML = '';
-  
-  apps.forEach(app => {
-    const li = document.createElement('li');
-    li.textContent = app;
-    appsList.appendChild(li);
-  });
-}
+// Removed updateSuitableApps function as the Suitable For section was removed
 
 /**
  * Update the detailed breakdown table
@@ -262,8 +292,8 @@ function generateEquationsHTML(hop, latencies) {
     'satellite': 300000
   }[hop.link.medium];
   
-  // Calculate utilization for queuing formula
-  const utilization = hop.queue.arrivalRate / hop.queue.serviceRate;
+  // Use link utilization directly for queuing
+  const utilization = hop.link.utilization;
   
   return `
     <div class="equations-grid">
@@ -344,10 +374,10 @@ function generateEquationsHTML(hop, latencies) {
             <span class="math">Queuing Delay (ms) = (1/(1-x)³) - 1</span>
           </div>
           <div class="calculation">
-            <span class="math">where x = utilization = arrival rate / service rate</span>
+            <span class="math">where x = link utilization (from Link Properties above)</span>
           </div>
           <div class="calculation">
-            <span class="math">x = ${hop.queue.arrivalRate} / ${hop.queue.serviceRate} = ${utilization.toFixed(3)}</span>
+            <span class="math">x = Link Utilization = ${utilization.toFixed(3)} (${(utilization * 100).toFixed(1)}%)</span>
           </div>
           ${utilization < 0.95 ? `
           <div class="calculation">
@@ -370,7 +400,7 @@ function generateEquationsHTML(hop, latencies) {
         </div>
         <div class="explanation">
           Link at ${(utilization*100).toFixed(1)}% utilization. 
-          As utilization approaches 100%, queuing delay grows exponentially.
+          Queuing delay depends only on link utilization, not packet size.
           ${utilization > 0.8 ? '<br><strong>⚠️ High utilization causing significant queuing!</strong>' : ''}
         </div>
       </div>
