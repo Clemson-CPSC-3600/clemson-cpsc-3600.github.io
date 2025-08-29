@@ -1,0 +1,478 @@
+/* Packet Journey Demo Styles */
+
+.demo-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.demo-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.demo-header h1 {
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.demo-description {
+  color: #666;
+  font-size: 1.1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Layout */
+.demo-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* Control Panel */
+.control-panel {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  position: sticky;
+  top: 20px;
+}
+
+.control-panel h2 {
+  color: var(--color-primary);
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.control-group {
+  margin-bottom: 1.5rem;
+}
+
+.control-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.control-group select,
+.control-group input[type="range"] {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.control-group input[type="range"] {
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+.help-text {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.primary-btn:hover {
+  background: #2980b9;
+}
+
+/* Results Panels */
+.results-panel,
+.breakdown-panel,
+.apps-panel {
+  background: #f8f9fa;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+
+.results-panel h3,
+.breakdown-panel h3,
+.apps-panel h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #2c3e50;
+}
+
+.result-item,
+.component-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.result-item:last-child,
+.component-item:last-child {
+  border-bottom: none;
+}
+
+.component-item {
+  gap: 0.5rem;
+}
+
+.component-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.label {
+  font-weight: 500;
+  color: #555;
+  flex: 1;
+}
+
+.value {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.apps-panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.apps-panel li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.apps-panel li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--color-success);
+  font-weight: bold;
+}
+
+/* Visualization Area */
+.visualization-area {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#network-canvas {
+  width: 100%;
+  height: 500px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 2rem;
+  background: #fafafa;
+}
+
+/* Detailed Breakdown Table */
+#detailed-breakdown {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--color-border);
+}
+
+#detailed-breakdown h3 {
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.table-hint {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+#breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+#breakdown-table th,
+#breakdown-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+#breakdown-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+#breakdown-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+#breakdown-table td:nth-child(n+3) {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+}
+
+/* Info Box */
+.info-box {
+  background: #e8f4f8;
+  border-left: 4px solid var(--color-primary);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.info-box h3 {
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}
+
+.info-box dl {
+  margin: 0;
+}
+
+.info-box dt {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-top: 0.75rem;
+}
+
+.info-box dt:first-child {
+  margin-top: 0;
+}
+
+.info-box dd {
+  margin: 0.25rem 0 0 1.5rem;
+  color: #555;
+}
+
+/* Quality Rating Colors */
+.quality-excellent { color: #2ecc71 !important; }
+.quality-good { color: #3498db !important; }
+.quality-fair { color: #f39c12 !important; }
+.quality-poor { color: #e74c3c !important; }
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .demo-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .control-panel {
+    position: static;
+    max-height: none;
+  }
+  
+  #network-canvas {
+    height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .demo-container {
+    padding: 1rem;
+  }
+  
+  .control-panel,
+  .visualization-area {
+    padding: 1rem;
+  }
+  
+  #network-canvas {
+    height: 300px;
+  }
+  
+  #breakdown-table {
+    font-size: 0.8rem;
+  }
+  
+  #breakdown-table th,
+  #breakdown-table td {
+    padding: 0.5rem;
+  }
+  
+  /* Hide some columns on mobile */
+  #breakdown-table th:nth-child(3),
+  #breakdown-table td:nth-child(3),
+  #breakdown-table th:nth-child(4),
+  #breakdown-table td:nth-child(4),
+  #breakdown-table th:nth-child(5),
+  #breakdown-table td:nth-child(5),
+  #breakdown-table th:nth-child(6),
+  #breakdown-table td:nth-child(6) {
+    display: none;
+  }
+}
+
+/* Loading State */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: " Calculating...";
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+/* Expandable Equations Styles */
+.hop-row.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.hop-row.clickable:hover {
+  background-color: #f0f8ff !important;
+}
+
+.hop-row.expanded {
+  background-color: #e8f4f8 !important;
+  font-weight: 600;
+}
+
+.expand-icon {
+  display: inline-block;
+  width: 16px;
+  transition: transform 0.2s;
+  font-size: 0.8em;
+  color: var(--color-primary);
+}
+
+.equations-row td {
+  padding: 0 !important;
+  background: #f8fafb;
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.equations-container {
+  padding: 1.5rem;
+  background: linear-gradient(to bottom, #f8fafb, white);
+}
+
+.equations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.equation-box {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.equation-box h4 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1rem;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 0.5rem;
+}
+
+.equation {
+  margin: 1rem 0;
+}
+
+.formula {
+  background: #e8f4f8;
+  padding: 0.75rem;
+  border-left: 3px solid var(--color-primary);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.calculation {
+  background: #f8f9fa;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border-left: 2px solid #95a5a6;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.calculation.satellite {
+  background: #fff3cd;
+  border-left-color: #f39c12;
+}
+
+.result {
+  background: #d4edda;
+  padding: 0.75rem;
+  border-left: 3px solid var(--color-success);
+  margin-top: 0.75rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.explanation {
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: #f0f0f0;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #555;
+  font-style: italic;
+}
+
+.math {
+  font-family: 'Courier New', 'Consolas', monospace;
+  white-space: nowrap;
+  overflow-x: auto;
+  display: inline-block;
+}
+
+/* Responsive adjustments for equations */
+@media (max-width: 1200px) {
+  .equations-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .equations-container {
+    padding: 1rem;
+  }
+  
+  .equation-box {
+    padding: 0.75rem;
+  }
+  
+  .math {
+    font-size: 0.8rem;
+  }
+  
+  /* Allow horizontal scroll for equations on mobile */
+  .equation {
+    overflow-x: auto;
+  }
+}

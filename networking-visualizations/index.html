@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive visualizations for learning networking concepts including TCP/IP, routing algorithms, and network protocols">
+  <title>Networking Visualizations - Learn Network Concepts Interactively</title>
+  
+  <style>
+    :root {
+      --color-primary: #3498db;
+      --color-success: #2ecc71;
+      --color-warning: #f39c12;
+      --color-danger: #e74c3c;
+      --color-node: #4a90e2;
+      --color-packet: #2ecc71;
+      --color-background: #f8f9fa;
+      --color-text: #2c3e50;
+      --color-border: #ddd;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--color-text);
+      background-color: var(--color-background);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .hero {
+      background: linear-gradient(135deg, var(--color-primary), #2980b9);
+      color: white;
+      padding: 4rem 2rem;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .hero p {
+      font-size: 1.25rem;
+      opacity: 0.95;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    
+    .feature-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+    
+    .feature-card h3 {
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+    }
+    
+    .feature-card .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .feature-card a {
+      display: inline-block;
+      margin-top: 1rem;
+      color: var(--color-primary);
+      text-decoration: none;
+      font-weight: bold;
+    }
+    
+    .feature-card a:hover {
+      text-decoration: underline;
+    }
+    
+    .quick-start {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      margin-bottom: 3rem;
+    }
+    
+    .quick-start h2 {
+      color: var(--color-primary);
+      margin-bottom: 1.5rem;
+    }
+    
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    
+    .demo-link {
+      background: var(--color-background);
+      padding: 1rem;
+      border-radius: 4px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--color-text);
+      transition: background 0.3s;
+    }
+    
+    .demo-link:hover {
+      background: var(--color-primary);
+      color: white;
+    }
+    
+    .demo-link .emoji {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="container">
+      <h1>Networking Visualizations</h1>
+      <p>Learn networking concepts through interactive visualizations and hands-on demonstrations</p>
+    </div>
+  </div>
+  
+  <main>
+    <div class="container">
+      <div class="features">
+        <div class="feature-card">
+          <div class="icon">🎮</div>
+          <h3>Interactive Demos</h3>
+          <p>Explore networking concepts through interactive simulations. Watch packets travel, see protocols in action, and understand how networks communicate.</p>
+          <a href="./demos/">Explore Demos →</a>
+        </div>
+        
+        <div class="feature-card">
+          <div class="icon">📚</div>
+          <h3>Step-by-Step Tutorials</h3>
+          <p>Learn at your own pace with guided tutorials. Each lesson breaks down complex topics into easy-to-understand steps with visual aids.</p>
+          <a href="./tutorials/">Start Learning →</a>
+        </div>
+        
+        <div class="feature-card">
+          <div class="icon">💻</div>
+          <h3>Code Examples</h3>
+          <p>See real implementation examples with syntax highlighting and explanations. Copy code snippets to use in your own projects.</p>
+          <a href="./examples/">View Examples →</a>
+        </div>
+      </div>
+      
+      <div class="quick-start">
+        <h2>🚀 Quick Start</h2>
+        <p>Jump right into our most popular networking visualizations:</p>
+        
+        <div class="demo-grid">
+          <a href="./demos/tcp-handshake/" class="demo-link">
+            <span class="emoji">🤝</span>
+            <span>TCP Handshake</span>
+          </a>
+          
+          <a href="./demos/packet-routing/" class="demo-link">
+            <span class="emoji">📦</span>
+            <span>Packet Routing</span>
+          </a>
+          
+          <a href="./demos/dns-lookup/" class="demo-link">
+            <span class="emoji">🔍</span>
+            <span>DNS Lookup</span>
+          </a>
+          
+          <a href="./demos/osi-layers/" class="demo-link">
+            <span class="emoji">📊</span>
+            <span>OSI Layers</span>
+          </a>
+        </div>
+      </div>
+      
+      <div class="quick-start">
+        <h2>📖 Topics Covered</h2>
+        <ul style="columns: 2; column-gap: 2rem; margin-left: 2rem;">
+          <li>TCP/IP Protocol Suite</li>
+          <li>Three-Way Handshake</li>
+          <li>Packet Switching</li>
+          <li>Routing Algorithms</li>
+          <li>DNS Resolution</li>
+          <li>HTTP/HTTPS</li>
+          <li>OSI Model</li>
+          <li>Network Topologies</li>
+          <li>IP Addressing</li>
+          <li>Subnetting</li>
+          <li>NAT/PAT</li>
+          <li>Load Balancing</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+  
+  <footer class="site-footer">
+    <p>© 2024 Networking Visualizations | 
+       <a href="./about/">About</a> | 
+       <a href="https://github.com/clemson-cpsc-3600/networking-visualizations">GitHub</a>
+    </p>
+  </footer>
+  
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

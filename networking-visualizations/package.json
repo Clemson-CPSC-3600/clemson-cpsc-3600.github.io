@@ -1,0 +1,17 @@
+{
+  "name": "networking-visualizations",
+  "version": "1.0.0",
+  "type": "module",
+  "homepage": "https://clemson-cpsc-3600.github.io/networking-visualizations",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "gh-pages": "^6.0.0"
+  }
+}
