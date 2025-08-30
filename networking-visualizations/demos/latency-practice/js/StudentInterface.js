@@ -6,6 +6,7 @@ export class StudentInterface {
   constructor(problemEngine) {
     this.engine = problemEngine;
     this.currentHintLevel = 0;
+    this.visualizer = null;
     
     // Cache DOM elements
     this.elements = {
@@ -27,6 +28,7 @@ export class StudentInterface {
       processingInput: document.getElementById('processing-input'),
       queuingInput: document.getElementById('queuing-input'),
       totalInput: document.getElementById('total-input'),
+      bottleneckSelect: null, // Will be created for bottleneck problems
       
       // Buttons
       checkAnswer: document.getElementById('check-answer'),
@@ -140,13 +142,23 @@ export class StudentInterface {
     // Reset answer area
     this.resetAnswerArea();
     
+    // Configure answer area based on problem type
+    this.configureAnswerArea(problem);
+    
     // Show relevant sections
     this.elements.answerArea.style.display = 'block';
     this.elements.visualizationContainer.style.display = 'block';
     this.elements.feedbackArea.style.display = 'none';
     
-    // Draw network visualization
-    this.drawNetwork(problem);
+    // Draw network visualization with enhanced visualizer
+    if (this.visualizer) {
+      // Force a reflow to ensure canvas is rendered
+      this.elements.canvas.offsetHeight;
+      this.visualizer.loadProblem(problem);
+    } else {
+      // Fallback to simple visualization
+      this.drawNetwork(problem);
+    }
     
     // Enable buttons
     this.elements.checkAnswer.disabled = false;
@@ -306,6 +318,38 @@ export class StudentInterface {
      this.elements.processingInput, this.elements.queuingInput].forEach(input => {
       input.classList.remove('correct', 'incorrect');
     });
+    
+    // Remove bottleneck selector if it exists
+    const bottleneckContainer = document.getElementById('bottleneck-selector');
+    if (bottleneckContainer) {
+      bottleneckContainer.remove();
+    }
+  }
+  
+  /**
+   * Configure answer area based on problem type
+   */
+  configureAnswerArea(problem) {
+    if (problem.type === 'identify-bottleneck') {
+      // Add bottleneck selector
+      const container = document.createElement('div');
+      container.id = 'bottleneck-selector';
+      container.className = 'bottleneck-selector';
+      container.innerHTML = `
+        <h4>Identify the Bottleneck:</h4>
+        <div class="bottleneck-options">
+          ${problem.given.hops.map((hop, index) => `
+            <label class="bottleneck-option">
+              <input type="radio" name="bottleneck" value="${index}">
+              <span>${hop.name}</span>
+            </label>
+          `).join('')}
+        </div>
+      `;
+      
+      const answerGrid = this.elements.answerArea.querySelector('.answer-grid');
+      answerGrid.parentNode.insertBefore(container, answerGrid.nextSibling);
+    }
   }
   
   /**
@@ -333,7 +377,27 @@ export class StudentInterface {
       total: parseFloat(this.elements.totalInput.value) || 0
     };
     
+    // Add bottleneck selection if applicable
+    if (this.engine.currentProblem?.type === 'identify-bottleneck') {
+      const bottleneckRadio = document.querySelector('input[name="bottleneck"]:checked');
+      if (bottleneckRadio) {
+        answer.bottleneck = parseInt(bottleneckRadio.value);
+      } else {
+        // No bottleneck selected
+        this.showFeedback({
+          feedback: 'Please select which hop is the bottleneck.',
+          correct: false
+        });
+        return;
+      }
+    }
+    
     const result = this.engine.checkAnswer(answer);
+    
+    // Show delay breakdown if correct
+    if (result.correct && this.visualizer && result.expected) {
+      this.visualizer.showDelayBreakdown(result.expected);
+    }
     
     // Update input styles
     if (result.componentResults) {
@@ -359,6 +423,9 @@ export class StudentInterface {
     if (result.correct) {
       this.elements.checkAnswer.disabled = true;
       this.elements.nextProblem.style.display = 'inline-block';
+      
+      // Visual celebration effect
+      this.showCelebration();
     }
   }
   
@@ -486,5 +553,28 @@ export class StudentInterface {
     if (meters >= 1000) return `${(meters / 1000).toFixed(1)} km`;
     if (meters < 1) return `${(meters * 100).toFixed(1)} cm`;
     return `${meters.toFixed(1)} m`;
+  }
+  
+  /**
+   * Show celebration animation for correct answers
+   */
+  showCelebration() {
+    // Create confetti effect
+    const confettiCount = 30;
+    const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'];
+    
+    for (let i = 0; i < confettiCount; i++) {
+      setTimeout(() => {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animationDelay = Math.random() * 0.5 + 's';
+        confetti.style.animationDuration = (Math.random() * 1 + 1) + 's';
+        document.body.appendChild(confetti);
+        
+        setTimeout(() => confetti.remove(), 2000);
+      }, i * 30);
+    }
   }
 }

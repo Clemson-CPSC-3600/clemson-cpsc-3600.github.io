@@ -1,0 +1,524 @@
+{
+  "problems": [
+    {
+      "id": "int-1",
+      "type": "calculate-total",
+      "difficulty": "intermediate",
+      "title": "Cloud Service Multi-Region",
+      "scenario": "A financial trading application needs to fetch market data from a cloud service. The request travels through multiple ISP hops and a CDN edge server.",
+      "given": {
+        "packetSize": 1500,
+        "hops": [
+          {
+            "name": "Trading Server to ISP Gateway",
+            "bandwidth": 10000000000,
+            "distance": 50,
+            "medium": "fiber",
+            "processingDelay": 0.02,
+            "queuingDelay": 0.15
+          },
+          {
+            "name": "ISP Gateway to Regional Hub",
+            "bandwidth": 40000000000,
+            "distance": 25000,
+            "medium": "fiber",
+            "processingDelay": 0.01,
+            "queuingDelay": 0.08
+          },
+          {
+            "name": "Regional Hub to CDN Edge",
+            "bandwidth": 100000000000,
+            "distance": 150000,
+            "medium": "fiber",
+            "processingDelay": 0.005,
+            "queuingDelay": 0.05
+          },
+          {
+            "name": "CDN Edge to Cloud Service",
+            "bandwidth": 10000000000,
+            "distance": 5000,
+            "medium": "fiber",
+            "processingDelay": 0.1,
+            "queuingDelay": 0.3
+          }
+        ],
+        "propagationSpeed": {
+          "fiber": 200000000
+        }
+      },
+      "question": "Calculate the total end-to-end latency for the market data request.",
+      "tolerance": 0.1,
+      "hints": [
+        "Remember to convert packet size from bytes to bits for transmission delay calculations.",
+        "The CDN edge server might have higher processing delay due to content caching operations.",
+        "Long-distance fiber links contribute significant propagation delay even at high speeds."
+      ]
+    },
+    {
+      "id": "int-2",
+      "type": "identify-bottleneck",
+      "difficulty": "intermediate",
+      "title": "Database Replication Bottleneck",
+      "scenario": "A distributed database is replicating large data chunks between data centers. Identify which network segment is causing the most delay.",
+      "given": {
+        "packetSize": 9000,
+        "hops": [
+          {
+            "name": "Primary DB to Local Switch",
+            "bandwidth": 10000000000,
+            "distance": 20,
+            "medium": "copper",
+            "processingDelay": 0.05,
+            "queuingDelay": 2.5
+          },
+          {
+            "name": "Local Switch to WAN Router",
+            "bandwidth": 1000000000,
+            "distance": 100,
+            "medium": "fiber",
+            "processingDelay": 0.1,
+            "queuingDelay": 5.8
+          },
+          {
+            "name": "WAN Link to Remote DC",
+            "bandwidth": 100000000,
+            "distance": 500000,
+            "medium": "fiber",
+            "processingDelay": 0.02,
+            "queuingDelay": 0.5
+          },
+          {
+            "name": "Remote Router to Secondary DB",
+            "bandwidth": 10000000000,
+            "distance": 50,
+            "medium": "fiber",
+            "processingDelay": 0.05,
+            "queuingDelay": 0.8
+          }
+        ],
+        "propagationSpeed": {
+          "fiber": 200000000,
+          "copper": 200000000
+        }
+      },
+      "question": "Calculate the total latency and identify which hop contributes the most delay.",
+      "tolerance": 0.1,
+      "hints": [
+        "Jumbo frames (9000 bytes) significantly increase transmission delay on slower links.",
+        "High queuing delay often indicates network congestion.",
+        "Compare the total delay contribution from each hop to find the bottleneck."
+      ]
+    },
+    {
+      "id": "int-3",
+      "type": "calculate-total",
+      "difficulty": "intermediate",
+      "title": "Satellite Internet Gaming",
+      "scenario": "A gamer in a rural area uses satellite internet to connect to a gaming server. The connection involves both satellite and terrestrial links.",
+      "given": {
+        "packetSize": 200,
+        "hops": [
+          {
+            "name": "Gaming PC to Satellite Modem",
+            "bandwidth": 1000000000,
+            "distance": 5,
+            "medium": "copper",
+            "processingDelay": 0.5,
+            "queuingDelay": 1.2
+          },
+          {
+            "name": "Uplink to Satellite",
+            "bandwidth": 10000000,
+            "distance": 35786000,
+            "medium": "satellite",
+            "processingDelay": 2.0,
+            "queuingDelay": 3.5
+          },
+          {
+            "name": "Satellite to Ground Station",
+            "bandwidth": 100000000,
+            "distance": 35786000,
+            "medium": "satellite",
+            "processingDelay": 1.5,
+            "queuingDelay": 2.0
+          },
+          {
+            "name": "Ground Station to Game Server",
+            "bandwidth": 10000000000,
+            "distance": 50000,
+            "medium": "fiber",
+            "processingDelay": 0.1,
+            "queuingDelay": 0.5
+          }
+        ],
+        "propagationSpeed": {
+          "copper": 200000000,
+          "satellite": 300000000,
+          "fiber": 200000000
+        }
+      },
+      "question": "Calculate the total round-trip time (RTT) for a gaming packet. Note: RTT = 2 × one-way latency.",
+      "tolerance": 0.1,
+      "hints": [
+        "Satellite links have very long distances (geostationary orbit at ~36,000 km).",
+        "Even at the speed of light, satellite propagation delay is significant.",
+        "Don't forget to multiply by 2 for round-trip time!"
+      ]
+    },
+    {
+      "id": "int-4",
+      "type": "calculate-total",
+      "difficulty": "intermediate",
+      "title": "5G Mobile Network Path",
+      "scenario": "A mobile user streams 4K video through a 5G network. The path includes wireless and fiber backhaul segments.",
+      "given": {
+        "packetSize": 1400,
+        "hops": [
+          {
+            "name": "Phone to 5G Tower",
+            "bandwidth": 1000000000,
+            "distance": 500,
+            "medium": "wireless-5g",
+            "processingDelay": 0.3,
+            "queuingDelay": 0.8
+          },
+          {
+            "name": "5G Tower to Edge Server",
+            "bandwidth": 10000000000,
+            "distance": 5000,
+            "medium": "fiber",
+            "processingDelay": 0.2,
+            "queuingDelay": 0.4
+          },
+          {
+            "name": "Edge Server to Regional POP",
+            "bandwidth": 100000000000,
+            "distance": 100000,
+            "medium": "fiber",
+            "processingDelay": 0.05,
+            "queuingDelay": 0.15
+          },
+          {
+            "name": "Regional POP to CDN",
+            "bandwidth": 10000000000,
+            "distance": 20000,
+            "medium": "fiber",
+            "processingDelay": 0.1,
+            "queuingDelay": 0.6
+          }
+        ],
+        "propagationSpeed": {
+          "wireless-5g": 300000000,
+          "fiber": 200000000
+        }
+      },
+      "question": "Calculate the total latency for the video streaming packet.",
+      "tolerance": 0.1,
+      "hints": [
+        "5G wireless propagation happens at the speed of light in air.",
+        "Edge computing reduces latency by processing closer to the user.",
+        "High-bandwidth backbone links have minimal transmission delay."
+      ]
+    },
+    {
+      "id": "int-5",
+      "type": "identify-bottleneck",
+      "difficulty": "intermediate",
+      "title": "Enterprise VPN Performance",
+      "scenario": "Remote employees connect to corporate resources through a VPN tunnel. Analyze the path to find performance issues.",
+      "given": {
+        "packetSize": 1300,
+        "hops": [
+          {
+            "name": "Laptop to Home Router",
+            "bandwidth": 100000000,
+            "distance": 8,
+            "medium": "wifi",
+            "processingDelay": 0.8,
+            "queuingDelay": 3.2
+          },
+          {
+            "name": "Home Router to ISP",
+            "bandwidth": 50000000,
+            "distance": 8000,
+            "medium": "coax",
+            "processingDelay": 1.2,
+            "queuingDelay": 4.5
+          },
+          {
+            "name": "ISP to VPN Gateway",
+            "bandwidth": 1000000000,
+            "distance": 200000,
+            "medium": "fiber",
+            "processingDelay": 0.5,
+            "queuingDelay": 1.0
+          },
+          {
+            "name": "VPN Gateway to Corporate Server",
+            "bandwidth": 10000000000,
+            "distance": 100,
+            "medium": "fiber",
+            "processingDelay": 2.5,
+            "queuingDelay": 0.5
+          }
+        ],
+        "propagationSpeed": {
+          "wifi": 200000000,
+          "coax": 140000000,
+          "fiber": 200000000
+        }
+      },
+      "question": "Calculate total latency and identify the primary bottleneck in the VPN connection.",
+      "tolerance": 0.1,
+      "hints": [
+        "Home internet connections often have asymmetric speeds and higher latency.",
+        "VPN gateways add processing delay for encryption/decryption.",
+        "Coaxial cable has slower propagation speed than fiber."
+      ]
+    },
+    {
+      "id": "int-6",
+      "type": "calculate-total",
+      "difficulty": "intermediate",
+      "title": "IoT Sensor Network",
+      "scenario": "Industrial IoT sensors send telemetry data through a mesh network to a cloud analytics platform.",
+      "given": {
+        "packetSize": 256,
+        "hops": [
+          {
+            "name": "Sensor to Mesh Gateway",
+            "bandwidth": 250000,
+            "distance": 100,
+            "medium": "zigbee",
+            "processingDelay": 5.0,
+            "queuingDelay": 8.5
+          },
+          {
+            "name": "Mesh Gateway to Edge Router",
+            "bandwidth": 100000000,
+            "distance": 50,
+            "medium": "copper",
+            "processingDelay": 1.0,
+            "queuingDelay": 2.0
+          },
+          {
+            "name": "Edge Router to Cloud",
+            "bandwidth": 1000000000,
+            "distance": 300000,
+            "medium": "fiber",
+            "processingDelay": 0.5,
+            "queuingDelay": 1.5
+          }
+        ],
+        "propagationSpeed": {
+          "zigbee": 300000000,
+          "copper": 200000000,
+          "fiber": 200000000
+        }
+      },
+      "question": "Calculate the total latency for IoT telemetry data to reach the cloud.",
+      "tolerance": 0.1,
+      "hints": [
+        "Low-power IoT protocols like Zigbee have limited bandwidth.",
+        "Mesh networks may have higher processing delays due to routing decisions.",
+        "Small packet sizes help reduce transmission delay on slow links."
+      ]
+    },
+    {
+      "id": "int-7",
+      "type": "calculate-total",
+      "difficulty": "intermediate",
+      "title": "Cross-Continental Video Call",
+      "scenario": "A video conference call between New York and London traverses undersea cables and multiple internet exchanges.",
+      "given": {
+        "packetSize": 1200,
+        "hops": [
+          {
+            "name": "NYC Office to Local IX",
+            "bandwidth": 10000000000,
+            "distance": 50000,
+            "medium": "fiber",
+            "processingDelay": 0.1,
+            "queuingDelay": 0.3
+          },
+          {
+            "name": "NYC IX to Undersea Cable",
+            "bandwidth": 100000000000,
+            "distance": 500,
+            "medium": "fiber",
+            "processingDelay": 0.05,
+            "queuingDelay": 0.1
+          },
+          {
+            "name": "Transatlantic Cable",
+            "bandwidth": 400000000000,
+            "distance": 5500000,
+            "medium": "undersea-fiber",
+            "processingDelay": 0.01,
+            "queuingDelay": 0.02
+          },
+          {
+            "name": "UK Landing to London IX",
+            "bandwidth": 100000000000,
+            "distance": 300000,
+            "medium": "fiber",
+            "processingDelay": 0.05,
+            "queuingDelay": 0.15
+          },
+          {
+            "name": "London IX to Office",
+            "bandwidth": 10000000000,
+            "distance": 20000,
+            "medium": "fiber",
+            "processingDelay": 0.1,
+            "queuingDelay": 0.4
+          }
+        ],
+        "propagationSpeed": {
+          "fiber": 200000000,
+          "undersea-fiber": 200000000
+        }
+      },
+      "question": "Calculate the one-way latency for the video call packet.",
+      "tolerance": 0.1,
+      "hints": [
+        "Undersea cables span thousands of kilometers.",
+        "Internet exchanges (IX) connect different networks with minimal delay.",
+        "High-capacity backbone links have very low transmission delays."
+      ]
+    },
+    {
+      "id": "int-8",
+      "type": "identify-bottleneck",
+      "difficulty": "intermediate",
+      "title": "Smart City Traffic System",
+      "scenario": "Traffic cameras send real-time video to a central control system. The network includes wireless and wired segments with varying performance.",
+      "given": {
+        "packetSize": 8000,
+        "hops": [
+          {
+            "name": "Camera to Street Cabinet",
+            "bandwidth": 100000000,
+            "distance": 200,
+            "medium": "wireless-ptmp",
+            "processingDelay": 1.5,
+            "queuingDelay": 12.0
+          },
+          {
+            "name": "Street Cabinet to District Hub",
+            "bandwidth": 1000000000,
+            "distance": 5000,
+            "medium": "fiber",
+            "processingDelay": 0.5,
+            "queuingDelay": 3.5
+          },
+          {
+            "name": "District Hub to Control Center",
+            "bandwidth": 10000000000,
+            "distance": 15000,
+            "medium": "fiber",
+            "processingDelay": 0.2,
+            "queuingDelay": 1.0
+          }
+        ],
+        "propagationSpeed": {
+          "wireless-ptmp": 300000000,
+          "fiber": 200000000
+        }
+      },
+      "question": "Calculate total latency and identify which segment causes the most delay for video packets.",
+      "tolerance": 0.1,
+      "hints": [
+        "Large video frames create significant transmission delay on slower links.",
+        "Wireless point-to-multipoint systems may have high queuing during peak times.",
+        "Street-level equipment often has limited bandwidth compared to backbone networks."
+      ]
+    },
+    {
+      "id": "int-9",
+      "type": "calculate-total",
+      "difficulty": "intermediate",
+      "title": "Blockchain Transaction Propagation",
+      "scenario": "A cryptocurrency transaction propagates through multiple nodes before reaching a mining pool.",
+      "given": {
+        "packetSize": 500,
+        "hops": [
+          {
+            "name": "Wallet to Local Node",
+            "bandwidth": 100000000,
+            "distance": 2000,
+            "medium": "copper",
+            "processingDelay": 2.0,
+            "queuingDelay": 1.5
+          },
+          {
+            "name": "Local Node to Regional Node",
+            "bandwidth": 1000000000,
+            "distance": 100000,
+            "medium": "fiber",
+            "processingDelay": 5.0,
+            "queuingDelay": 3.0
+          },
+          {
+            "name": "Regional Node to Mining Pool",
+            "bandwidth": 10000000000,
+            "distance": 500000,
+            "medium": "fiber",
+            "processingDelay": 3.0,
+            "queuingDelay": 2.0
+          }
+        ],
+        "propagationSpeed": {
+          "copper": 200000000,
+          "fiber": 200000000
+        }
+      },
+      "question": "Calculate the total propagation time for the blockchain transaction.",
+      "tolerance": 0.1,
+      "hints": [
+        "Blockchain nodes perform validation which adds processing delay.",
+        "Transaction size is relatively small, minimizing transmission delay.",
+        "Geographic distribution of nodes creates significant propagation delay."
+      ]
+    },
+    {
+      "id": "int-10",
+      "type": "calculate-total",
+      "difficulty": "intermediate",
+      "title": "Augmented Reality Mobile App",
+      "scenario": "An AR app on a mobile device fetches 3D model data from an edge computing server through a 5G network.",
+      "given": {
+        "packetSize": 1460,
+        "hops": [
+          {
+            "name": "Mobile to 5G Small Cell",
+            "bandwidth": 500000000,
+            "distance": 100,
+            "medium": "mmwave-5g",
+            "processingDelay": 0.2,
+            "queuingDelay": 0.5
+          },
+          {
+            "name": "Small Cell to Edge Server",
+            "bandwidth": 10000000000,
+            "distance": 1000,
+            "medium": "fiber",
+            "processingDelay": 0.15,
+            "queuingDelay": 0.3
+          }
+        ],
+        "propagationSpeed": {
+          "mmwave-5g": 300000000,
+          "fiber": 200000000
+        }
+      },
+      "question": "Calculate the total latency for AR model data. This needs to be under 20ms for smooth AR experience.",
+      "tolerance": 0.1,
+      "hints": [
+        "5G mmWave offers high bandwidth but limited range.",
+        "Edge computing minimizes the number of hops needed.",
+        "AR applications require ultra-low latency for good user experience."
+      ]
+    }
+  ]
+}

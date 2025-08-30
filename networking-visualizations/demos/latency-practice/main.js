@@ -3,6 +3,7 @@
  */
 import { ProblemEngine } from './js/ProblemEngine.js';
 import { StudentInterface } from './js/StudentInterface.js';
+import { NetworkVisualizer } from './js/NetworkVisualizer.js';
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async () => {
@@ -14,22 +15,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Create student interface
   const studentInterface = new StudentInterface(problemEngine);
   
+  // Create network visualizer
+  const canvas = document.getElementById('network-canvas');
+  const visualizer = new NetworkVisualizer(canvas);
+  
+  // Connect visualizer to UI
+  studentInterface.visualizer = visualizer;
+  
   // Load problems
   try {
+    const allProblems = [];
+    
     // Load beginner problems
-    const response = await fetch('./problems/beginner.json');
-    const beginnerProblems = await response.json();
+    const beginnerResponse = await fetch('./problems/beginner.json');
+    const beginnerData = await beginnerResponse.json();
+    allProblems.push(...beginnerData.problems);
     
-    // In the future, we can load intermediate and advanced problems too
-    // const intermediateProblems = await fetch('./problems/intermediate.json').then(r => r.json());
-    // const advancedProblems = await fetch('./problems/advanced.json').then(r => r.json());
+    // Load intermediate problems
+    try {
+      const intermediateResponse = await fetch('./problems/intermediate.json');
+      const intermediateData = await intermediateResponse.json();
+      allProblems.push(...intermediateData.problems);
+    } catch (e) {
+      console.log('Intermediate problems not available yet');
+    }
     
-    // Combine all problems
-    const allProblems = [
-      ...beginnerProblems,
-      // ...intermediateProblems,
-      // ...advancedProblems
-    ];
+    // Load advanced problems (future)
+    // const advancedResponse = await fetch('./problems/advanced.json');
+    // const advancedData = await advancedResponse.json();
+    // allProblems.push(...advancedData.problems);
     
     // Load problems into the interface
     studentInterface.loadProblemSet(allProblems);

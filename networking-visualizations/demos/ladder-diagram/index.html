@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive ladder diagram visualization showing packet flow through a network">
+  <title>Ladder Diagram - Network Latency Visualization</title>
+  
+  <link rel="stylesheet" href="../../shared/styles/main.css">
+  <link rel="stylesheet" href="./styles/ladder.css">
+</head>
+<body>
+  <main>
+    <div class="ladder-container">
+      <header class="ladder-header">
+        <h1>Network Ladder Diagram</h1>
+        <p class="subtitle">Visualize packet flow through time and space</p>
+      </header>
+      
+      <div class="ladder-layout">
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+          <div class="control-section">
+            <h3>Playback Controls</h3>
+            <div class="playback-controls">
+              <button id="play-pause" class="btn btn-primary">
+                <span class="play-icon">▶</span>
+                <span class="pause-icon" style="display: none;">⏸</span>
+              </button>
+              <button id="step-backward" class="btn btn-secondary">⏮</button>
+              <button id="step-forward" class="btn btn-secondary">⏭</button>
+              <button id="reset" class="btn btn-secondary">⏹</button>
+            </div>
+            
+            <div class="speed-control">
+              <label for="speed-slider">Speed:</label>
+              <input type="range" id="speed-slider" min="0.05" max="2" step="0.05" value="0.25">
+              <span id="speed-display">0.25x</span>
+            </div>
+            
+            <div class="time-display">
+              <label>Current Time:</label>
+              <span id="current-time">0.00 ms</span>
+            </div>
+          </div>
+          
+          <div class="control-section">
+            <h3>Scenario</h3>
+            <select id="scenario-select" class="scenario-dropdown">
+              <option value="simple">Simple 2-Hop Network</option>
+              <option value="lan">Local Area Network</option>
+              <option value="wan">Wide Area Network</option>
+              <option value="congested">Congested Network</option>
+              <option value="balanced">Balanced Delays (Equal Components)</option>
+              <option value="transcontinental">Transcontinental Cable (NYC-London)</option>
+              <option value="satellite">Satellite Internet (Geostationary)</option>
+            </select>
+          </div>
+          
+          <div class="control-section">
+            <h3>Packet Info</h3>
+            <div class="info-display">
+              <div class="info-item">
+                <label>Size:</label>
+                <span id="packet-size">1500 bytes</span>
+              </div>
+              <div class="info-item">
+                <label>Location:</label>
+                <span id="packet-location">Source</span>
+              </div>
+              <div class="info-item">
+                <label>Current Delay:</label>
+                <span id="current-delay">-</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="control-section">
+            <h3>Delay Components</h3>
+            <div class="delay-totals">
+              <div class="delay-item transmission">
+                <span class="delay-color"></span>
+                <label>Transmission:</label>
+                <span id="transmission-total">0.00 ms</span>
+              </div>
+              <div class="delay-item propagation">
+                <span class="delay-color"></span>
+                <label>Propagation:</label>
+                <span id="propagation-total">0.00 ms</span>
+              </div>
+              <div class="delay-item processing">
+                <span class="delay-color"></span>
+                <label>Processing:</label>
+                <span id="processing-total">0.00 ms</span>
+              </div>
+              <div class="delay-item queuing">
+                <span class="delay-color"></span>
+                <label>Queuing:</label>
+                <span id="queuing-total">0.00 ms</span>
+              </div>
+              <div class="delay-item total">
+                <label>Total:</label>
+                <span id="total-delay">0.00 ms</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="control-section">
+            <h3>Legend</h3>
+            <div class="legend">
+              <div class="legend-item">
+                <span class="legend-line transmission"></span>
+                <span>Transmission</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-line propagation"></span>
+                <span>Propagation</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-box processing"></span>
+                <span>Processing</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-box queuing"></span>
+                <span>Queuing</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Main Visualization -->
+        <div class="visualization-area">
+          <div id="ladder-diagram" class="ladder-diagram">
+            <svg id="ladder-svg" width="100%" height="100%" viewBox="0 0 800 600">
+              <!-- SVG content will be generated by JavaScript -->
+            </svg>
+          </div>
+          
+          <div class="timeline-controls">
+            <input type="range" id="timeline-slider" class="timeline-slider" min="0" max="100" value="0">
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

@@ -44,7 +44,7 @@ export class ProblemEngine {
       timestamp: Date.now()
     });
     
-    // Calculate expected answer if needed
+    // Handle different problem types
     if (problem.type === 'calculate-total') {
       const expected = this.calculateExpectedAnswer(problem);
       result.expected = expected;
@@ -78,6 +78,66 @@ export class ProblemEngine {
       // Calculate score
       if (result.correct) {
         result.score = this.calculateScore(problem);
+        this.score += result.score;
+        this.streak++;
+      } else {
+        this.streak = 0;
+      }
+    } else if (problem.type === 'identify-bottleneck') {
+      // Calculate expected answer with per-hop breakdown
+      const expected = this.calculateExpectedAnswer(problem);
+      result.expected = expected;
+      
+      // Find the bottleneck (hop with maximum total delay)
+      let maxDelay = 0;
+      let bottleneckIndex = 0;
+      expected.perHop.forEach((hop, index) => {
+        if (hop.total > maxDelay) {
+          maxDelay = hop.total;
+          bottleneckIndex = index;
+        }
+      });
+      
+      // Check components like calculate-total
+      const tolerance = problem.tolerance || 0.1;
+      result.componentResults = {};
+      
+      ['transmission', 'propagation', 'processing', 'queuing'].forEach(component => {
+        if (studentAnswer[component] !== undefined) {
+          const diff = Math.abs(studentAnswer[component] - expected.components[component]);
+          result.componentResults[component] = {
+            correct: diff <= tolerance,
+            expected: expected.components[component],
+            actual: studentAnswer[component],
+            difference: diff
+          };
+        }
+      });
+      
+      // Check total
+      const totalDiff = Math.abs(studentAnswer.total - expected.total);
+      const totalCorrect = totalDiff <= tolerance;
+      
+      // Check bottleneck identification
+      const bottleneckCorrect = studentAnswer.bottleneck === bottleneckIndex;
+      
+      result.correct = totalCorrect && bottleneckCorrect;
+      result.bottleneckIndex = bottleneckIndex;
+      result.bottleneckHop = problem.given.hops[bottleneckIndex];
+      result.maxDelay = maxDelay;
+      
+      // Generate feedback
+      if (result.correct) {
+        result.feedback = `✅ Correct! You correctly identified ${result.bottleneckHop.name} as the bottleneck with ${maxDelay.toFixed(2)}ms delay.`;
+      } else if (totalCorrect && !bottleneckCorrect) {
+        result.feedback = `❌ Your calculations are correct, but the bottleneck is ${result.bottleneckHop.name}, not hop ${studentAnswer.bottleneck + 1}.`;
+      } else {
+        result.feedback = this.generateFeedback(result, problem);
+      }
+      
+      // Calculate score
+      if (result.correct) {
+        result.score = this.calculateScore(problem) * 1.5; // Bonus for bottleneck problems
         this.score += result.score;
         this.streak++;
       } else {
