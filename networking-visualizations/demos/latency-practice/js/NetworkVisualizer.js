@@ -7,6 +7,8 @@ export class NetworkVisualizer {
     this.ctx = canvas.getContext('2d');
     this.nodes = [];
     this.links = [];
+    this.packets = [];
+    this.animationFrameId = null;
     this.delayBreakdown = null;
     
     // Visual settings
@@ -45,15 +47,24 @@ export class NetworkVisualizer {
         width = 800;
         height = 250;
       }
+      
+      // Also set the canvas style dimensions
+      this.canvas.style.width = width + 'px';
+      this.canvas.style.height = height + 'px';
     }
     
     const dpr = window.devicePixelRatio || 1;
     this.canvas.width = width * dpr;
     this.canvas.height = height * dpr;
+    
+    // Reset context after canvas size change
+    this.ctx = this.canvas.getContext('2d');
     this.ctx.scale(dpr, dpr);
     
     this.width = width;
     this.height = height;
+    
+    console.log('Canvas setup complete:', width, 'x', height, 'DPR:', dpr);
   }
   
   bindEvents() {
@@ -247,6 +258,16 @@ export class NetworkVisualizer {
   
   
   /**
+   * Stop any running animation
+   */
+  stopAnimation() {
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+  }
+  
+  /**
    * Clear the canvas
    */
   clear() {
@@ -255,7 +276,9 @@ export class NetworkVisualizer {
     this.links = [];
     this.packets = [];
     this.delayBreakdown = null;
-    this.ctx.clearRect(0, 0, this.width, this.height);
+    if (this.ctx && this.width && this.height) {
+      this.ctx.clearRect(0, 0, this.width, this.height);
+    }
   }
   
   

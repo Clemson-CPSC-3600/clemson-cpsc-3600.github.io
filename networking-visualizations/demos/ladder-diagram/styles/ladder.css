@@ -475,6 +475,101 @@
   }
 }
 
+/* Packet Mode Controls */
+.packet-mode-toggle {
+  margin-bottom: 1rem;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.toggle-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.packet-send-mode,
+.packet-interval-control,
+.burst-size-control {
+  margin-bottom: 0.75rem;
+}
+
+.packet-send-mode label,
+.packet-interval-control label,
+.burst-size-control label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #34495e;
+  font-size: 0.9rem;
+}
+
+.mode-dropdown {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #e0e6ed;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
+  cursor: pointer;
+}
+
+.mode-dropdown:hover {
+  border-color: #3498db;
+}
+
+.mode-dropdown:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+#packet-interval,
+#burst-size {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #e0e6ed;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+#packet-interval:focus,
+#burst-size:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.packets-info {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e6ed;
+}
+
+.packets-info .info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  margin-bottom: 0.25rem;
+}
+
+.packets-info .info-item label {
+  color: #7f8c8d;
+  font-size: 0.85rem;
+}
+
+.packets-info .info-item span {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
 /* Animation for packet pulse */
 @keyframes pulse {
   0% {
@@ -484,5 +579,99 @@
   100% {
     r: 12;
     opacity: 0;
+  }
+}
+
+/* Animation for time line intersection pulse */
+@keyframes timeIntersectionPulse {
+  0% {
+    r: 6;
+    stroke-opacity: 0.8;
+  }
+  100% {
+    r: 12;
+    stroke-opacity: 0;
+  }
+}
+
+/* Apply animation to pulsing elements */
+.time-intersection.pulsing {
+  animation: timeIntersectionPulse 1.5s ease-out infinite;
+}
+
+/* Packet phase animations */
+@keyframes transmitGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px #e74c3c);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px #e74c3c);
+  }
+}
+
+@keyframes propagateMove {
+  0%, 100% {
+    transform: translateX(-2px);
+  }
+  50% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes processingSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes queueBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Apply animations to packet phases */
+.packet-transmitting {
+  animation: transmitGlow 1s ease-in-out infinite;
+}
+
+.packet-propagating {
+  animation: propagateMove 0.5s ease-in-out infinite;
+}
+
+.processing-indicator {
+  animation: processingSpin 2s linear infinite;
+  transform-origin: center;
+}
+
+.packet-queued {
+  animation: queueBounce 1s ease-in-out infinite;
+}
+
+/* Smooth transitions for all packet elements */
+.packet-detailed rect,
+.packet-detailed circle {
+  transition: all 0.2s ease-out;
+}
+
+/* Highlight effect for active segments */
+.segment.highlighted {
+  filter: brightness(1.3) drop-shadow(0 0 4px currentColor);
+  stroke-width: 3;
+  animation: segmentPulse 1s ease-in-out infinite;
+}
+
+@keyframes segmentPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
   }
 }

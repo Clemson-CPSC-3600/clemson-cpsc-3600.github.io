@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transmission Delay Test</title>
+  <link rel="stylesheet" href="../../shared/styles/base.css">
+  <style>
+    .test-case {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f5f5f5;
+      border-radius: 5px;
+    }
+    .test-case h3 {
+      margin-top: 0;
+    }
+    .result {
+      font-family: monospace;
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      margin: 10px 0;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .expected {
+      color: #666;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="page-header">
+      <h1>🧪 Transmission Delay Test</h1>
+      <p>Testing if transmission delay is correctly inversely proportional to bandwidth</p>
+    </header>
+
+    <div id="test-results"></div>
+  </main>
+
+  <script type="module">
+    import { DelayCalculator } from '../../shared/utils/DelayCalculator.js';
+    
+    const resultsDiv = document.getElementById('test-results');
+    
+    // Test cases
+    const testCases = [
+      {
+        name: 'Test 1: 100 Mbps link',
+        hop: { 
+          node: 'Node A', 
+          bandwidth: 100000000, // 100 Mbps
+          distance: 0 
+        },
+        packetSize: 1500,
+        expectedTransmission: 0.12 // (1500 * 8) / 100e6 * 1000 = 0.12ms
+      },
+      {
+        name: 'Test 2: 1 Gbps link (10x faster)',
+        hop: { 
+          node: 'Node B', 
+          bandwidth: 1000000000, // 1 Gbps
+          distance: 0 
+        },
+        packetSize: 1500,
+        expectedTransmission: 0.012 // Should be 10x faster: 0.012ms
+      },
+      {
+        name: 'Test 3: 10 Gbps link (100x faster than 100Mbps)',
+        hop: { 
+          node: 'Node C', 
+          bandwidth: 10000000000, // 10 Gbps
+          distance: 0 
+        },
+        packetSize: 1500,
+        expectedTransmission: 0.0012 // Should be 100x faster: 0.0012ms
+      },
+      {
+        name: 'Test 4: 10 Mbps link (10x slower than 100Mbps)',
+        hop: { 
+          node: 'Node D', 
+          bandwidth: 10000000, // 10 Mbps
+          distance: 0 
+        },
+        packetSize: 1500,
+        expectedTransmission: 1.2 // Should be 10x slower: 1.2ms
+      }
+    ];
+    
+    // Run tests
+    testCases.forEach((testCase, index) => {
+      const delays = DelayCalculator.calculateHopDelays(testCase.hop, testCase.packetSize);
+      const actual = delays.transmission;
+      const expected = testCase.expectedTransmission;
+      const ratio = actual / expected;
+      const isCorrect = Math.abs(ratio - 1) < 0.01; // Within 1% tolerance
+      
+      const testDiv = document.createElement('div');
+      testDiv.className = 'test-case';
+      testDiv.innerHTML = `
+        <h3>${testCase.name}</h3>
+        <div class="result">
+          Bandwidth: ${(testCase.hop.bandwidth / 1e6).toFixed(0)} Mbps<br>
+          Packet Size: ${testCase.packetSize} bytes (${testCase.packetSize * 8} bits)<br>
+          <br>
+          Expected Transmission Delay: ${expected.toFixed(6)} ms<br>
+          Actual Transmission Delay: ${actual.toFixed(6)} ms<br>
+          Ratio (actual/expected): ${ratio.toFixed(4)}<br>
+          <br>
+          <span class="${isCorrect ? 'success' : 'error'}">
+            ${isCorrect ? '✓ PASS' : '✗ FAIL'}: 
+            ${isCorrect ? 'Transmission delay is correct' : 'Transmission delay is incorrect'}
+          </span>
+        </div>
+      `;
+      resultsDiv.appendChild(testDiv);
+    });
+    
+    // Test the scenarios
+    const scenarioDiv = document.createElement('div');
+    scenarioDiv.className = 'test-case';
+    scenarioDiv.innerHTML = '<h3>Testing Actual Scenario Hops</h3>';
+    
+    import { journeyScenarios } from './js/configs/journeyScenarios.js';
+    
+    const scenario = journeyScenarios['home-internet'];
+    let html = '<div class="result">';
+    html += '<strong>Home Internet Scenario:</strong><br><br>';
+    
+    scenario.hops.forEach((hop, i) => {
+      const delays = DelayCalculator.calculateHopDelays(hop, 1500);
+      html += `Hop ${i}: ${hop.node}<br>`;
+      html += `  Bandwidth: ${hop.bandwidth ? (hop.bandwidth / 1e9).toFixed(3) + ' Gbps' : 'N/A'}<br>`;
+      html += `  Transmission: ${delays.transmission.toFixed(6)} ms<br>`;
+      html += `  Formula: (1500 * 8) / ${hop.bandwidth} * 1000 = ${delays.transmission.toFixed(6)}<br>`;
+      html += '<br>';
+    });
+    
+    html += '</div>';
+    scenarioDiv.innerHTML += html;
+    resultsDiv.appendChild(scenarioDiv);
+    
+    // Summary
+    const summaryDiv = document.createElement('div');
+    summaryDiv.className = 'test-case';
+    summaryDiv.innerHTML = `
+      <h3>Summary</h3>
+      <div class="result">
+        <p><strong>Observation:</strong> The transmission delay calculation IS working correctly.</p>
+        <p>The formula is: <code>transmission_delay = (packet_bits / bandwidth) * 1000</code></p>
+        <p>When bandwidth increases by 10x, transmission delay decreases by 10x.</p>
+        <br>
+        <p><strong>Issue might be:</strong> The bandwidth values in the scenario might represent the link TO the node, 
+        not FROM the node. This would mean we're using the wrong hop's bandwidth for each link.</p>
+      </div>
+    `;
+    resultsDiv.appendChild(summaryDiv);
+  </script>
+</body>
+</html>

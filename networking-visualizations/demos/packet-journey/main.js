@@ -1,412 +1,306 @@
-import { NetworkPath } from './js/NetworkPath.js';
-import { PacketJourneyVisualization } from './js/Visualization.js';
-import { HopControls } from './js/Controls.js';
+/**
+ * Main entry point for Packet Journey demo - REFACTORED VERSION
+ * Uses the new modular components and configuration-driven scenarios
+ */
+
+import { PacketJourneyVisualization } from './js/VisualizationRefactored.js';
+import { ScenarioManager } from './js/components/ScenarioManager.js';
+import { DelayCalculator } from '../../shared/utils/DelayCalculator.js';
+import { NetworkFormatter } from '../../shared/utils/NetworkFormatter.js';
 
 // Global instances
-let networkPath;
 let visualization;
-let hopControls;
-let currentLatencyData = null;
+let scenarioManager;
+let currentScenario = null;
 
 /**
  * Initialize the demo
  */
 function init() {
-  // Create network path with default configuration
-  networkPath = new NetworkPath();
+  console.log('🚀 Initializing refactored Packet Journey demo...');
   
-  // Create visualization
-  visualization = new PacketJourneyVisualization('network-canvas');
+  try {
+    // Create visualization with new refactored components
+    visualization = new PacketJourneyVisualization('network-canvas');
+    console.log('✅ Visualization initialized');
+    
+    // Create scenario manager
+    const scenarioContainer = document.getElementById('scenario-controls');
+    if (!scenarioContainer) {
+      // Create container if it doesn't exist
+      const controlPanel = document.querySelector('.control-panel');
+      if (controlPanel) {
+        const div = document.createElement('div');
+        div.id = 'scenario-controls';
+        controlPanel.insertBefore(div, controlPanel.firstChild.nextSibling);
+      }
+    }
+    
+    scenarioManager = new ScenarioManager('scenario-controls', (scenario) => {
+      handleScenarioChange(scenario);
+    });
+    console.log('✅ Scenario manager initialized');
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Load default scenario
+    scenarioManager.loadDefault();
+    console.log('✅ Default scenario loaded');
+    
+    // Hide old controls that aren't needed with new system
+    hideOldControls();
+    
+  } catch (error) {
+    console.error('❌ Failed to initialize:', error);
+    showError('Failed to initialize visualization. Please check the console for details.');
+  }
+}
+
+/**
+ * Handle scenario change
+ */
+function handleScenarioChange(scenario) {
+  if (!scenario) {
+    visualization.clear();
+    hideResults();
+    return;
+  }
   
-  // Create hop controls (but don't display them)
-  hopControls = new HopControls(networkPath, () => {
-    calculateAndDisplay();
+  console.log('📋 Loading scenario:', scenario.name);
+  console.log('Scenario data:', scenario);
+  console.log('First hop utilization:', scenario.hops[0]?.utilization);
+  currentScenario = scenario;
+  
+  // Packet size is fixed at standard MTU of 1500 bytes
+  
+  // Render the scenario
+  renderScenario();
+}
+
+/**
+ * Render the current scenario
+ */
+function renderScenario() {
+  if (!currentScenario) return;
+  
+  try {
+    // Prepare path data for visualization
+    const path = {
+      hops: currentScenario.hops
+    };
+    
+    // Render visualization
+    visualization.render(path);
+    
+    // Calculate and display results
+    calculateAndDisplayResults();
+    
+  } catch (error) {
+    console.error('❌ Failed to render scenario:', error);
+    showError('Failed to render scenario. Please try another one.');
+  }
+}
+
+/**
+ * Calculate and display latency results
+ */
+function calculateAndDisplayResults() {
+  if (!currentScenario) return;
+  
+  // Calculate total latency using shared DelayCalculator
+  const packetSize = 1500; // Standard MTU
+  let totalDelay = 0;
+  let delayBreakdown = {
+    transmission: 0,
+    propagation: 0,
+    processing: 0,
+    queuing: 0
+  };
+  
+  currentScenario.hops.forEach((hop, index) => {
+    if (index === currentScenario.hops.length - 1) return; // Skip last node
+    
+    const delays = DelayCalculator.calculateHopDelays(hop, packetSize);
+    totalDelay += delays.total;
+    delayBreakdown.transmission += delays.transmission || 0;
+    delayBreakdown.propagation += delays.propagation || 0;
+    delayBreakdown.processing += delays.processing || 0;
+    delayBreakdown.queuing += delays.queuing || 0;
   });
   
-  // Don't insert hop controls into the page
-  // insertHopControls();
-  
-  // Set up event listeners
-  setupEventListeners();
-  
-  // Calculate initial latency (this will also render the path)
-  performCalculation();
+  // Display results
+  displayResults(totalDelay, delayBreakdown);
 }
 
 /**
- * Insert hop controls into the DOM
+ * Display calculation results
  */
-function insertHopControls() {
-  // Find or create container for hop controls
-  let controlsContainer = document.getElementById('hop-controls-section');
-  if (!controlsContainer) {
-    // Create it after the suitable apps panel
-    const suitableApps = document.getElementById('suitable-apps');
-    if (suitableApps) {
-      controlsContainer = document.createElement('div');
-      controlsContainer.id = 'hop-controls-section';
-      controlsContainer.className = 'hop-controls-section';
-      suitableApps.parentNode.insertBefore(controlsContainer, suitableApps.nextSibling);
-    }
+function displayResults(totalDelay, breakdown) {
+  const resultsPanel = document.getElementById('results-summary');
+  if (!resultsPanel) return;
+  
+  resultsPanel.style.display = 'block';
+  
+  // Update total latency
+  const totalElement = document.getElementById('total-latency');
+  if (totalElement) {
+    totalElement.textContent = NetworkFormatter.time(totalDelay);
   }
   
-  if (controlsContainer) {
-    controlsContainer.innerHTML = hopControls.createHopControlsPanel();
-    hopControls.bindEvents(controlsContainer);
+  // Update latency quality indicator
+  const qualityElement = document.getElementById('latency-quality');
+  if (qualityElement) {
+    const quality = NetworkFormatter.latencyQuality(totalDelay);
+    qualityElement.textContent = quality;
+    qualityElement.className = `quality-indicator quality-${quality.toLowerCase()}`;
+  }
+  
+  // Update breakdown if elements exist
+  updateBreakdownDisplay(breakdown);
+  
+  // Update suitable apps
+  updateSuitableApps(totalDelay);
+}
+
+/**
+ * Update breakdown display
+ */
+function updateBreakdownDisplay(breakdown) {
+  const elements = {
+    'breakdown-transmission': breakdown.transmission,
+    'breakdown-propagation': breakdown.propagation,
+    'breakdown-processing': breakdown.processing,
+    'breakdown-queuing': breakdown.queuing
+  };
+  
+  Object.entries(elements).forEach(([id, value]) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = NetworkFormatter.time(value);
+    }
+  });
+}
+
+/**
+ * Update suitable applications display
+ */
+function updateSuitableApps(totalDelay) {
+  const appsPanel = document.getElementById('suitable-apps');
+  if (!appsPanel) return;
+  
+  let apps = [];
+  if (totalDelay < 30) {
+    apps = ['✅ Real-time Gaming', '✅ Video Calls', '✅ VoIP', '✅ All Applications'];
+  } else if (totalDelay < 60) {
+    apps = ['✅ Video Calls', '✅ VoIP', '✅ Web Browsing', '⚠️ Competitive Gaming'];
+  } else if (totalDelay < 100) {
+    apps = ['✅ Web Browsing', '✅ Email', '⚠️ Video Calls', '❌ Gaming'];
+  } else if (totalDelay < 200) {
+    apps = ['✅ Web Browsing', '✅ Email', '❌ Video Calls', '❌ Gaming'];
+  } else {
+    apps = ['⚠️ Web Browsing', '✅ Email', '❌ Real-time Applications'];
+  }
+  
+  const appsList = appsPanel.querySelector('.apps-list');
+  if (appsList) {
+    appsList.innerHTML = apps.map(app => `<div class="app-item">${app}</div>`).join('');
   }
 }
 
 /**
- * Set up all event listeners
+ * Hide results panel
+ */
+function hideResults() {
+  const resultsPanel = document.getElementById('results-summary');
+  if (resultsPanel) {
+    resultsPanel.style.display = 'none';
+  }
+}
+
+/**
+ * Hide old controls that are replaced by new system
+ */
+function hideOldControls() {
+  // Hide the old preset selector since we have scenario manager
+  const presetGroup = document.querySelector('#preset-select')?.closest('.control-group');
+  if (presetGroup) {
+    presetGroup.style.display = 'none';
+  }
+}
+
+/**
+ * Set up event listeners
  */
 function setupEventListeners() {
-  // Preset selector
-  const presetSelect = document.getElementById('preset-select');
-  presetSelect.addEventListener('change', (e) => {
-    networkPath.loadPreset(e.target.value);
-    // Automatically calculate with new preset
-    performCalculation(); // Use performCalculation directly to avoid debounce
-  });
-  
-  // Packet size slider
-  const packetSizeSlider = document.getElementById('packet-size');
-  const packetSizeValue = document.getElementById('packet-size-value');
-  
-  packetSizeSlider.addEventListener('input', (e) => {
-    packetSizeValue.textContent = e.target.value;
-    // Automatically recalculate latency when packet size changes
-    calculateAndDisplay();
-  });
+  // Packet size is fixed at 1500 bytes - no controls needed
   
   // Handle window resize
   window.addEventListener('resize', () => {
-    visualization.handleResize();
-    if (currentLatencyData) {
-      visualization.renderPath(networkPath, currentLatencyData);
-    } else {
-      visualization.renderPath(networkPath);
+    if (visualization && currentScenario) {
+      visualization.handleResize();
     }
   });
 }
 
-// Debounce timer for auto-calculation
-let calculateDebounceTimer = null;
-
 /**
- * Calculate latency and update display
+ * Show error message
  */
-function calculateAndDisplay() {
-  // Clear any existing debounce timer
-  if (calculateDebounceTimer) {
-    clearTimeout(calculateDebounceTimer);
-  }
+function showError(message) {
+  console.error(message);
   
-  // Debounce the calculation for smooth user experience
-  calculateDebounceTimer = setTimeout(() => {
-    performCalculation();
-  }, 150); // Small delay for smooth interaction
-}
-
-/**
- * Actually perform the calculation
- */
-function performCalculation() {
-  // Get packet size
-  const packetSize = parseInt(document.getElementById('packet-size').value);
-  
-  // Calculate latency
-  currentLatencyData = networkPath.calculateTotalLatency(packetSize);
-  
-  // Find bottleneck
-  const bottleneck = networkPath.findBottleneck(packetSize);
-  
-  // Update visualization with latency data
-  visualization.renderPath(networkPath, currentLatencyData);
-  
-  // Update results summary
-  updateResultsSummary(currentLatencyData, bottleneck);
-  
-  // Update component breakdown
-  updateComponentBreakdown(currentLatencyData.components);
-  
-  // Update detailed breakdown table
-  updateBreakdownTable(currentLatencyData.breakdown);
-  
-  // Update hop latency displays in controls
-  if (hopControls) {
-    hopControls.updateLatencyDisplays(currentLatencyData);
-    // Also update the control panel values to reflect any changes from popup
-    for (let i = 0; i < networkPath.hops.length; i++) {
-      hopControls.updateControlDisplays(i);
-    }
-  }
-  
-  // Show all result panels
-  document.getElementById('results-summary').style.display = 'block';
-  document.getElementById('component-breakdown').style.display = 'block';
-  document.getElementById('detailed-breakdown').style.display = 'block';
-}
-
-// Expose calculateAndDisplay to window for popup to use
-window.calculateAndDisplay = calculateAndDisplay;
-
-/**
- * Update the results summary panel
- */
-function updateResultsSummary(latencyData, bottleneck) {
-  // Total latency
-  const totalElement = document.getElementById('total-latency');
-  totalElement.textContent = `${latencyData.total.toFixed(2)} ms`;
-  totalElement.className = 'value';
-  
-  // Add color based on value
-  if (latencyData.total < 30) {
-    totalElement.style.color = '#2ecc71';
-  } else if (latencyData.total < 60) {
-    totalElement.style.color = '#3498db';
-  } else if (latencyData.total < 100) {
-    totalElement.style.color = '#f39c12';
-  } else {
-    totalElement.style.color = '#e74c3c';
-  }
-  
-  // Quality rating
-  const qualityElement = document.getElementById('quality-rating');
-  qualityElement.textContent = latencyData.summary.quality;
-  qualityElement.className = `value quality-${latencyData.summary.quality.toLowerCase()}`;
-  
-  // Bottleneck
-  const bottleneckElement = document.getElementById('bottleneck-hop');
-  if (bottleneck && bottleneck.hop) {
-    bottleneckElement.textContent = `${bottleneck.hop.name} (${bottleneck.latency.toFixed(1)}ms)`;
-  } else {
-    bottleneckElement.textContent = 'None identified';
-  }
-}
-
-/**
- * Update the component breakdown panel
- */
-function updateComponentBreakdown(components) {
-  document.getElementById('total-transmission').textContent = 
-    `${components.transmission.toFixed(2)} ms`;
-  document.getElementById('total-propagation').textContent = 
-    `${components.propagation.toFixed(2)} ms`;
-  document.getElementById('total-processing').textContent = 
-    `${components.processing.toFixed(2)} ms`;
-  document.getElementById('total-queuing').textContent = 
-    `${components.queuing.toFixed(2)} ms`;
-}
-
-// Removed updateSuitableApps function as the Suitable For section was removed
-
-/**
- * Update the detailed breakdown table
- */
-function updateBreakdownTable(breakdown) {
-  const tbody = document.getElementById('breakdown-tbody');
-  tbody.innerHTML = '';
-  
-  breakdown.forEach((hop, index) => {
-    const hopData = networkPath.hops[index];
-    
-    // Main row
-    const row = document.createElement('tr');
-    row.className = 'hop-row clickable';
-    row.dataset.hopIndex = index;
-    
-    // Highlight bottleneck row
-    const isBottleneck = Math.max(...breakdown.map(h => h.latencies.total)) === hop.latencies.total;
-    if (isBottleneck) {
-      row.style.backgroundColor = '#fff3cd';
-    }
-    
-    row.innerHTML = `
-      <td><span class="expand-icon">▶</span> ${hop.hopNumber}</td>
-      <td>${hop.hopName}</td>
-      <td>${hop.latencies.transmission.toFixed(2)}ms</td>
-      <td>${hop.latencies.propagation.toFixed(2)}ms</td>
-      <td>${hop.latencies.processing.toFixed(2)}ms</td>
-      <td>${hop.latencies.queuing.toFixed(2)}ms</td>
-      <td><strong>${hop.latencies.total.toFixed(2)}ms</strong></td>
-      <td><strong>${hop.cumulative.toFixed(2)}ms</strong></td>
+  // Try to display error in UI
+  const canvas = document.getElementById('network-canvas');
+  if (canvas && canvas.parentElement) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #e74c3c;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 1000;
     `;
+    errorDiv.textContent = message;
+    canvas.parentElement.appendChild(errorDiv);
     
-    // Add click handler to toggle equations
-    row.addEventListener('click', () => toggleEquations(index));
-    
-    tbody.appendChild(row);
-    
-    // Equations detail row (hidden by default)
-    const equationsRow = document.createElement('tr');
-    equationsRow.className = 'equations-row';
-    equationsRow.id = `equations-${index}`;
-    equationsRow.style.display = 'none';
-    
-    equationsRow.innerHTML = `
-      <td colspan="8">
-        <div class="equations-container">
-          ${generateEquationsHTML(hopData, hop.latencies)}
-        </div>
-      </td>
-    `;
-    
-    tbody.appendChild(equationsRow);
-  });
-}
-
-/**
- * Toggle equation details for a hop
- */
-function toggleEquations(hopIndex) {
-  const equationsRow = document.getElementById(`equations-${hopIndex}`);
-  const hopRow = document.querySelector(`[data-hop-index="${hopIndex}"]`);
-  const expandIcon = hopRow.querySelector('.expand-icon');
-  
-  if (equationsRow.style.display === 'none') {
-    equationsRow.style.display = 'table-row';
-    expandIcon.textContent = '▼';
-    hopRow.classList.add('expanded');
-  } else {
-    equationsRow.style.display = 'none';
-    expandIcon.textContent = '▶';
-    hopRow.classList.remove('expanded');
+    // Remove after 5 seconds
+    setTimeout(() => {
+      errorDiv.remove();
+    }, 5000);
   }
 }
 
 /**
- * Generate HTML for equations display
+ * Log component status for debugging
  */
-function generateEquationsHTML(hop, latencies) {
-  const packetSize = parseInt(document.getElementById('packet-size').value);
-  const packetSizeBits = packetSize * 8;
+function logComponentStatus() {
+  console.group('🔍 Refactored Components Status');
+  console.log('Visualization:', visualization ? '✅ Loaded' : '❌ Not loaded');
+  console.log('ScenarioManager:', scenarioManager ? '✅ Loaded' : '❌ Not loaded');
+  console.log('Current Scenario:', currentScenario ? currentScenario.name : 'None');
   
-  // Get the actual values used in calculations
-  const bandwidth = hop.link.bandwidth;
-  const effectiveBandwidth = bandwidth * (1 - hop.link.utilization);
-  const distance = hop.link.distance;
-  const signalSpeed = {
-    'fiber': 200000,
-    'copper': 180000,
-    'wifi': 300000,
-    'satellite': 300000
-  }[hop.link.medium];
-  
-  // Use link utilization directly for queuing
-  const utilization = hop.link.utilization;
-  
-  return `
-    <div class="equations-grid">
-      <!-- Transmission Delay -->
-      <div class="equation-box">
-        <h4>🔷 Transmission Delay</h4>
-        <div class="equation">
-          <div class="formula">
-            <span class="math">Transmission = Packet Size / Effective Bandwidth</span>
-          </div>
-          <div class="calculation">
-            <span class="math">= (${packetSize} bytes × 8 bits/byte) / (${(bandwidth/1_000_000).toFixed(0)} Mbps × ${((1-hop.link.utilization)*100).toFixed(0)}%)</span>
-          </div>
-          <div class="calculation">
-            <span class="math">= ${packetSizeBits} bits / ${(effectiveBandwidth/1_000_000).toFixed(0)} Mbps</span>
-          </div>
-          <div class="result">
-            <span class="math">= ${latencies.transmission.toFixed(3)} ms</span>
-          </div>
-        </div>
-        <div class="explanation">
-          Time to serialize all ${packetSizeBits} bits onto a ${(bandwidth/1_000_000).toFixed(0)} Mbps link 
-          with ${(hop.link.utilization*100).toFixed(0)}% utilization
-        </div>
-      </div>
-      
-      <!-- Propagation Delay -->
-      <div class="equation-box">
-        <h4>🟢 Propagation Delay</h4>
-        <div class="equation">
-          <div class="formula">
-            <span class="math">Propagation = Distance / Signal Speed</span>
-          </div>
-          <div class="calculation">
-            <span class="math">= ${distance} km / ${(signalSpeed/1000).toFixed(0)},000 km/s</span>
-          </div>
-          ${hop.link.medium === 'satellite' ? `
-          <div class="calculation satellite">
-            <span class="math">+ 71,572 km round trip to GEO satellite</span>
-          </div>
-          ` : ''}
-          <div class="result">
-            <span class="math">= ${latencies.propagation.toFixed(3)} ms</span>
-          </div>
-        </div>
-        <div class="explanation">
-          Signal travels at ${((signalSpeed/300000)*100).toFixed(0)}% speed of light through ${hop.link.medium}
-        </div>
-      </div>
-      
-      <!-- Processing Delay -->
-      <div class="equation-box">
-        <h4>🟠 Processing Delay</h4>
-        <div class="equation">
-          <div class="formula">
-            <span class="math">Processing = Base Time × Power Factor × Load Factor</span>
-          </div>
-          <div class="calculation">
-            <span class="math">= ${(hop.device.processingTimeBase*1000).toFixed(1)} ms × ${
-              hop.device.processingPower === 'low' ? '3.0' : 
-              hop.device.processingPower === 'medium' ? '1.5' : '1.0'
-            } × (1 + ${hop.device.currentLoad.toFixed(1)} × 2)</span>
-          </div>
-          <div class="result">
-            <span class="math">= ${latencies.processing.toFixed(3)} ms</span>
-          </div>
-        </div>
-        <div class="explanation">
-          ${hop.device.processingPower} power device at ${(hop.device.currentLoad*100).toFixed(0)}% CPU load
-        </div>
-      </div>
-      
-      <!-- Queuing Delay -->
-      <div class="equation-box">
-        <h4>🔴 Queuing Delay</h4>
-        <div class="equation">
-          <div class="formula">
-            <span class="math">Queuing Delay (ms) = (1/(1-x)³) - 1</span>
-          </div>
-          <div class="calculation">
-            <span class="math">where x = link utilization (from Link Properties above)</span>
-          </div>
-          <div class="calculation">
-            <span class="math">x = Link Utilization = ${utilization.toFixed(3)} (${(utilization * 100).toFixed(1)}%)</span>
-          </div>
-          ${utilization < 0.95 ? `
-          <div class="calculation">
-            <span class="math">Queuing Delay = 1/(1 - ${utilization.toFixed(3)})³ - 1</span>
-          </div>
-          <div class="calculation">
-            <span class="math">= 1/${Math.pow(1-utilization, 3).toFixed(4)} - 1</span>
-          </div>
-          <div class="calculation">
-            <span class="math">= ${(1/Math.pow(1-utilization, 3)).toFixed(3)} - 1</span>
-          </div>
-          ` : `
-          <div class="calculation">
-            <span class="math">Queue unstable! (x ≥ 0.95) - Using max delay</span>
-          </div>
-          `}
-          <div class="result">
-            <span class="math">= ${latencies.queuing.toFixed(3)} ms</span>
-          </div>
-        </div>
-        <div class="explanation">
-          Link at ${(utilization*100).toFixed(1)}% utilization. 
-          Queuing delay depends only on link utilization, not packet size.
-          ${utilization > 0.8 ? '<br><strong>⚠️ High utilization causing significant queuing!</strong>' : ''}
-        </div>
-      </div>
-    </div>
-  `;
+  if (visualization && visualization.orchestrator) {
+    console.log('Orchestrator:', '✅ Active');
+    console.log('Components:', {
+      pathRenderer: visualization.orchestrator.pathRenderer ? '✅' : '❌',
+      latencyVisualizer: visualization.orchestrator.latencyVisualizer ? '✅' : '❌',
+      popupManager: visualization.orchestrator.popupManager ? '✅' : '❌',
+      tooltipManager: visualization.orchestrator.tooltipManager ? '✅' : '❌'
+    });
+  }
+  console.groupEnd();
 }
 
 // Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', init);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+

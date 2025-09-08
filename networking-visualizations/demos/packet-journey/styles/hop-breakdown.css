@@ -1,0 +1,243 @@
+/**
+ * Styles for the Hop Breakdown Table component
+ */
+
+.hop-breakdown-section {
+  margin-top: 24px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hop-breakdown-section h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.table-hint {
+  margin: 0 0 16px 0;
+  color: #666;
+  font-size: 13px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.breakdown-table thead {
+  background: #f8f9fa;
+}
+
+.breakdown-table th {
+  padding: 12px 8px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+  white-space: nowrap;
+}
+
+.breakdown-table tbody tr {
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+.breakdown-table tbody tr.hop-row:hover {
+  background: #f8f9fa;
+}
+
+.breakdown-table tbody tr.hop-row.clickable {
+  cursor: pointer;
+}
+
+.breakdown-table tbody tr.hop-row.expanded {
+  background: #e8f4fd;
+}
+
+.breakdown-table tbody tr.hop-row.bottleneck {
+  background: #fff3cd;
+}
+
+.breakdown-table tbody tr.hop-row.bottleneck:hover {
+  background: #ffe69c;
+}
+
+.breakdown-table td {
+  padding: 10px 8px;
+  color: #333;
+}
+
+.breakdown-table td.no-data {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 24px;
+}
+
+/* Expand icon */
+.expand-icon {
+  display: inline-block;
+  width: 12px;
+  font-size: 10px;
+  color: #6c757d;
+  transition: transform 0.2s ease;
+}
+
+.hop-row.expanded .expand-icon {
+  transform: rotate(90deg);
+}
+
+/* Node name styling */
+.node-name {
+  font-weight: 500;
+}
+
+/* Delay cells */
+.delay-transmission,
+.delay-propagation,
+.delay-processing,
+.delay-queuing {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.total-delay,
+.cumulative-delay {
+  font-weight: 600;
+}
+
+/* Details row */
+.details-row {
+  background: #f8f9fa;
+}
+
+.details-row td {
+  padding: 0;
+}
+
+/* Equations container */
+.equations-container {
+  padding: 20px;
+  background: white;
+  margin: 8px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.equations-container h4 {
+  margin: 0 0 16px 0;
+  color: #495057;
+  font-size: 16px;
+}
+
+.equations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.equation-card {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.equation-card h5 {
+  margin: 0 0 8px 0;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.equation {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.equation .formula {
+  color: #0066cc;
+  font-weight: 600;
+}
+
+.equation .calculation {
+  color: #666;
+  padding-left: 12px;
+}
+
+.equation .result {
+  color: #28a745;
+  font-weight: 600;
+  padding-left: 12px;
+}
+
+.equation-card .explanation {
+  margin: 8px 0 0 0;
+  color: #6c757d;
+  font-size: 11px;
+  font-style: italic;
+}
+
+/* Link properties */
+.link-properties {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #dee2e6;
+}
+
+.link-properties h5 {
+  margin: 0 0 12px 0;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.properties-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.property {
+  display: flex;
+  gap: 8px;
+}
+
+.property .label {
+  color: #6c757d;
+  font-size: 12px;
+}
+
+.property .value {
+  color: #333;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .equations-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .breakdown-table {
+    font-size: 12px;
+  }
+  
+  .breakdown-table th,
+  .breakdown-table td {
+    padding: 8px 4px;
+  }
+}

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Refactored Packet Journey Visualization</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      margin: 0 0 24px 0;
+      color: #333;
+    }
+    
+    .canvas-container {
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 24px;
+      background: #fafafa;
+      margin-bottom: 24px;
+    }
+    
+    canvas {
+      display: block;
+      margin: 0 auto;
+      border: 1px solid #ddd;
+      background: white;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    button {
+      padding: 8px 16px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    
+    button:hover {
+      background: #2980b9;
+    }
+    
+    .info {
+      background: #e8f4fd;
+      border: 1px solid #3498db;
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+    
+    .status.success {
+      background: #2ecc71;
+      color: white;
+    }
+    
+    .status.error {
+      background: #e74c3c;
+      color: white;
+    }
+    
+    .test-results {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 16px;
+      margin-top: 24px;
+    }
+    
+    .test-results h3 {
+      margin: 0 0 12px 0;
+      color: #555;
+    }
+    
+    .test-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .test-item:last-child {
+      border-bottom: none;
+    }
+    
+    .check {
+      color: #2ecc71;
+      font-weight: bold;
+    }
+    
+    .cross {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Test Refactored Packet Journey Visualization</h1>
+    
+    <div class="info">
+      <strong>Testing the refactored visualization with modular components:</strong>
+      <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+        <li>VisualizationOrchestrator - Main coordinator</li>
+        <li>CanvasPathRenderer - Network path rendering</li>
+        <li>LatencyVisualizer - Delay breakdown charts</li>
+        <li>PopupManager - Link property popups</li>
+        <li>TooltipManager - Hover tooltips</li>
+      </ul>
+    </div>
+    
+    <div class="controls">
+      <button onclick="testScenario1()">Test Scenario 1: Simple Path</button>
+      <button onclick="testScenario2()">Test Scenario 2: Complex Path</button>
+      <button onclick="testScenario3()">Test Scenario 3: High Latency</button>
+      <button onclick="runAllTests()">Run All Tests</button>
+    </div>
+    
+    <div class="canvas-container">
+      <canvas id="journey-canvas"></canvas>
+    </div>
+    
+    <div class="test-results" id="test-results" style="display: none;">
+      <h3>Test Results</h3>
+      <div id="test-list"></div>
+    </div>
+  </div>
+  
+  <script type="module">
+    import { PacketJourneyVisualization } from './js/VisualizationRefactored.js';
+    
+    // Initialize visualization
+    let viz;
+    
+    try {
+      viz = new PacketJourneyVisualization('journey-canvas');
+      console.log('✅ Visualization initialized successfully');
+      
+      // Make functions available globally for buttons
+      window.viz = viz;
+    } catch (error) {
+      console.error('❌ Failed to initialize visualization:', error);
+    }
+    
+    // Test Scenario 1: Simple path
+    window.testScenario1 = function() {
+      const path = {
+        hops: [
+          {
+            node: 'Client',
+            nodeType: 'client',
+            bandwidth: 100000000, // 100 Mbps
+            distance: 0,
+            processingPower: 'medium',
+            cpuLoad: 0.3
+          },
+          {
+            node: 'Home Router',
+            nodeType: 'router',
+            bandwidth: 1000000000, // 1 Gbps
+            distance: 0.001, // 1m
+            processingPower: 'low',
+            cpuLoad: 0.5,
+            utilization: 0.4
+          },
+          {
+            node: 'ISP Edge',
+            nodeType: 'isp-edge',
+            bandwidth: 10000000000, // 10 Gbps
+            distance: 10, // 10km
+            processingPower: 'high',
+            cpuLoad: 0.6,
+            utilization: 0.7
+          },
+          {
+            node: 'Server',
+            nodeType: 'server',
+            bandwidth: 10000000000,
+            distance: 50, // 50km
+            processingPower: 'high',
+            cpuLoad: 0.4
+          }
+        ]
+      };
+      
+      viz.render(path);
+      showTestResult('Scenario 1: Simple Path', true);
+    };
+    
+    // Test Scenario 2: Complex path with many hops
+    window.testScenario2 = function() {
+      const path = {
+        hops: [
+          {
+            node: 'Client',
+            nodeType: 'client',
+            bandwidth: 100000000,
+            distance: 0,
+            processingPower: 'medium',
+            cpuLoad: 0.2
+          },
+          {
+            node: 'Switch',
+            nodeType: 'switch',
+            bandwidth: 1000000000,
+            distance: 0.001,
+            processingPower: 'medium',
+            cpuLoad: 0.3
+          },
+          {
+            node: 'Router 1',
+            nodeType: 'router',
+            bandwidth: 1000000000,
+            distance: 0.005,
+            processingPower: 'medium',
+            cpuLoad: 0.7,
+            utilization: 0.8
+          },
+          {
+            node: 'Firewall',
+            nodeType: 'firewall',
+            bandwidth: 10000000000,
+            distance: 0.01,
+            processingPower: 'high',
+            cpuLoad: 0.5
+          },
+          {
+            node: 'ISP Edge',
+            nodeType: 'isp-edge',
+            bandwidth: 10000000000,
+            distance: 15,
+            processingPower: 'high',
+            cpuLoad: 0.6,
+            utilization: 0.6
+          },
+          {
+            node: 'Core Router',
+            nodeType: 'core',
+            bandwidth: 40000000000,
+            distance: 100,
+            processingPower: 'high',
+            cpuLoad: 0.4
+          },
+          {
+            node: 'Load Balancer',
+            nodeType: 'loadbalancer',
+            bandwidth: 10000000000,
+            distance: 50,
+            processingPower: 'high',
+            cpuLoad: 0.8,
+            utilization: 0.9
+          },
+          {
+            node: 'Server',
+            nodeType: 'server',
+            bandwidth: 10000000000,
+            distance: 0.01,
+            processingPower: 'high',
+            cpuLoad: 0.3
+          }
+        ]
+      };
+      
+      viz.render(path);
+      showTestResult('Scenario 2: Complex Path', true);
+    };
+    
+    // Test Scenario 3: High latency scenario
+    window.testScenario3 = function() {
+      const path = {
+        hops: [
+          {
+            node: 'Client',
+            nodeType: 'client',
+            bandwidth: 10000000, // 10 Mbps (slow connection)
+            distance: 0,
+            processingPower: 'low',
+            cpuLoad: 0.9 // High load
+          },
+          {
+            node: 'Congested Router',
+            nodeType: 'router',
+            bandwidth: 100000000,
+            distance: 5,
+            processingPower: 'low',
+            cpuLoad: 0.95, // Very high load
+            utilization: 0.95 // Heavy congestion
+          },
+          {
+            node: 'Satellite Link',
+            nodeType: 'isp-edge',
+            bandwidth: 50000000,
+            distance: 35786, // Geostationary satellite distance
+            processingPower: 'medium',
+            cpuLoad: 0.7,
+            utilization: 0.8
+          },
+          {
+            node: 'Remote Server',
+            nodeType: 'server',
+            bandwidth: 1000000000,
+            distance: 1000, // 1000km
+            processingPower: 'medium',
+            cpuLoad: 0.85 // High server load
+          }
+        ]
+      };
+      
+      viz.render(path);
+      showTestResult('Scenario 3: High Latency', true);
+    };
+    
+    // Show test result
+    window.showTestResult = function(testName, success) {
+      const resultsDiv = document.getElementById('test-results');
+      const testList = document.getElementById('test-list');
+      
+      resultsDiv.style.display = 'block';
+      
+      const testItem = document.createElement('div');
+      testItem.className = 'test-item';
+      testItem.innerHTML = `
+        <span>${testName}</span>
+        <span class="${success ? 'check' : 'cross'}">${success ? '✓' : '✗'}</span>
+      `;
+      
+      testList.appendChild(testItem);
+    };
+    
+    // Run all tests
+    window.runAllTests = function() {
+      // Clear previous results
+      document.getElementById('test-list').innerHTML = '';
+      document.getElementById('test-results').style.display = 'block';
+      
+      // Run tests with delays for visual confirmation
+      setTimeout(() => {
+        testScenario1();
+        setTimeout(() => {
+          testScenario2();
+          setTimeout(() => {
+            testScenario3();
+            
+            // Add summary
+            const summary = document.createElement('div');
+            summary.style.marginTop = '16px';
+            summary.style.paddingTop = '16px';
+            summary.style.borderTop = '2px solid #ddd';
+            summary.innerHTML = '<strong>All tests completed successfully!</strong>';
+            document.getElementById('test-list').appendChild(summary);
+          }, 1500);
+        }, 1500);
+      }, 500);
+    };
+    
+    // Load initial scenario
+    if (viz) {
+      testScenario1();
+    }
+  </script>
+</body>
+</html>

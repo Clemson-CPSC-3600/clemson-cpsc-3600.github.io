@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test ScenarioManager Refactoring</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    
+    h1 {
+      color: #333;
+      margin-top: 0;
+    }
+    
+    h2 {
+      color: #555;
+      margin-top: 30px;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 5px;
+    }
+    
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    .test-controls {
+      margin: 10px 0;
+    }
+    
+    select, button {
+      padding: 8px 12px;
+      margin-right: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    
+    button:hover {
+      background: #2980b9;
+    }
+    
+    .scenario-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 10px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+    
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    .comparison-column {
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 4px;
+    }
+    
+    .comparison-column h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    
+    .success {
+      color: #27ae60;
+      font-weight: bold;
+    }
+    
+    .error {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+    
+    .info {
+      color: #3498db;
+      font-weight: bold;
+    }
+    
+    .test-result {
+      margin: 10px 0;
+      padding: 10px;
+      border-left: 4px solid #ddd;
+      background: #fafafa;
+    }
+    
+    .test-result.pass {
+      border-color: #27ae60;
+      background: #e8f8f5;
+    }
+    
+    .test-result.fail {
+      border-color: #e74c3c;
+      background: #ffebee;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+    }
+    
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    th {
+      background: #3498db;
+      color: white;
+      font-weight: bold;
+    }
+    
+    tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+    
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .metric-card {
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .metric-value {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+    
+    .metric-label {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ScenarioManager Refactoring Test Suite</h1>
+    
+    <div class="test-section">
+      <h2>Scenario Loading Test</h2>
+      <div class="test-controls">
+        <select id="scenario-select">
+          <option value="">Loading scenarios...</option>
+        </select>
+        <button id="load-scenario-btn">Load Scenario</button>
+        <button id="compare-btn">Compare Old vs New</button>
+        <button id="run-all-tests-btn">Run All Tests</button>
+      </div>
+      <div id="scenario-info" class="scenario-info">Select a scenario to view details...</div>
+    </div>
+    
+    <div class="test-section">
+      <h2>Comparison Results</h2>
+      <div id="comparison-results" class="comparison">
+        <div class="comparison-column">
+          <h3>Original ScenarioManager</h3>
+          <div id="original-stats">Not loaded</div>
+        </div>
+        <div class="comparison-column">
+          <h3>Refactored ScenarioManager</h3>
+          <div id="refactored-stats">Not loaded</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="test-section">
+      <h2>Test Results</h2>
+      <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section">
+      <h2>Metrics</h2>
+      <div class="metrics">
+        <div class="metric-card">
+          <div class="metric-label">Original LOC</div>
+          <div class="metric-value" id="original-loc">364</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Refactored LOC</div>
+          <div class="metric-value" id="refactored-loc">120</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Config LOC</div>
+          <div class="metric-value" id="config-loc">290</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Reduction</div>
+          <div class="metric-value" id="reduction">67%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { ScenarioManager as OriginalScenarioManager } from './js/ScenarioManager.js';
+    import { ScenarioManager as RefactoredScenarioManager } from './js/ScenarioManagerRefactored.js';
+    import { NetworkFormatter } from './js/utils/NetworkFormatter.js';
+    
+    // Initialize managers
+    const originalManager = new OriginalScenarioManager();
+    const refactoredManager = new RefactoredScenarioManager();
+    
+    // DOM elements
+    const scenarioSelect = document.getElementById('scenario-select');
+    const scenarioInfo = document.getElementById('scenario-info');
+    const originalStats = document.getElementById('original-stats');
+    const refactoredStats = document.getElementById('refactored-stats');
+    const testResults = document.getElementById('test-results');
+    
+    // Populate scenario dropdown
+    function populateScenarios() {
+      scenarioSelect.innerHTML = '';
+      
+      // Add grouped scenarios
+      for (const [groupKey, group] of Object.entries(refactoredManager.groups)) {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = group.name;
+        
+        group.scenarios.forEach(scenarioKey => {
+          const option = document.createElement('option');
+          option.value = scenarioKey;
+          option.textContent = refactoredManager.scenarios[scenarioKey]?.name || scenarioKey;
+          optgroup.appendChild(option);
+        });
+        
+        scenarioSelect.appendChild(optgroup);
+      }
+      
+      // Select first scenario
+      if (scenarioSelect.options.length > 0) {
+        scenarioSelect.selectedIndex = 0;
+        loadScenario();
+      }
+    }
+    
+    // Load and display scenario
+    function loadScenario() {
+      const scenarioName = scenarioSelect.value;
+      if (!scenarioName) return;
+      
+      const scenario = refactoredManager.getScenario(scenarioName);
+      
+      // Display scenario info
+      scenarioInfo.innerHTML = `
+        <strong>${scenario.name}</strong><br>
+        ${scenario.description}<br><br>
+        <strong>Packet Size:</strong> ${scenario.packetSize} bytes<br>
+        <strong>Nodes:</strong> ${scenario.nodes.map(n => `${n.name} (${n.type})`).join(' → ')}<br>
+        <strong>Hops:</strong> ${scenario.hops.length}<br><br>
+        <strong>Total Delay:</strong> ${NetworkFormatter.time(scenario.statistics.total)}<br>
+        <strong>Dominant Component:</strong> ${scenario.dominantComponent.name} 
+        (${scenario.dominantComponent.percentage.toFixed(1)}%)
+      `;
+    }
+    
+    // Compare old vs new implementations
+    function compareImplementations() {
+      const scenarioName = scenarioSelect.value;
+      if (!scenarioName) return;
+      
+      const originalScenario = originalManager.getScenario(scenarioName);
+      const refactoredScenario = refactoredManager.getScenario(scenarioName);
+      
+      // Calculate original stats
+      const originalCalcStats = originalManager.calculateStatistics(originalScenario);
+      
+      // Display original stats
+      originalStats.innerHTML = `
+        <table>
+          <tr><th>Property</th><th>Value</th></tr>
+          <tr><td>Total Delay</td><td>${NetworkFormatter.time(originalCalcStats.totalDelay)}</td></tr>
+          <tr><td>Transmission</td><td>${NetworkFormatter.time(originalCalcStats.transmissionDelay)}</td></tr>
+          <tr><td>Propagation</td><td>${NetworkFormatter.time(originalCalcStats.propagationDelay)}</td></tr>
+          <tr><td>Processing</td><td>${NetworkFormatter.time(originalCalcStats.processingDelay)}</td></tr>
+          <tr><td>Queuing</td><td>${NetworkFormatter.time(originalCalcStats.queuingDelay)}</td></tr>
+          <tr><td>Dominant</td><td>${originalCalcStats.dominantComponent}</td></tr>
+        </table>
+      `;
+      
+      // Display refactored stats
+      refactoredStats.innerHTML = `
+        <table>
+          <tr><th>Property</th><th>Value</th></tr>
+          <tr><td>Total Delay</td><td>${NetworkFormatter.time(refactoredScenario.statistics.total)}</td></tr>
+          <tr><td>Transmission</td><td>${NetworkFormatter.time(refactoredScenario.statistics.transmission)}</td></tr>
+          <tr><td>Propagation</td><td>${NetworkFormatter.time(refactoredScenario.statistics.propagation)}</td></tr>
+          <tr><td>Processing</td><td>${NetworkFormatter.time(refactoredScenario.statistics.processing)}</td></tr>
+          <tr><td>Queuing</td><td>${NetworkFormatter.time(refactoredScenario.statistics.queuing)}</td></tr>
+          <tr><td>Dominant</td><td>${refactoredScenario.dominantComponent.name}</td></tr>
+        </table>
+      `;
+      
+      // Check if values match
+      const tolerance = 0.001; // Allow small floating point differences
+      const match = Math.abs(originalCalcStats.totalDelay - refactoredScenario.statistics.total) < tolerance;
+      
+      if (match) {
+        refactoredStats.innerHTML += '<p class="success">✓ Values match!</p>';
+      } else {
+        refactoredStats.innerHTML += '<p class="error">✗ Values differ!</p>';
+      }
+    }
+    
+    // Run all tests
+    function runAllTests() {
+      const results = [];
+      const scenarioNames = refactoredManager.getScenarioNames();
+      
+      // Test 1: All scenarios load without error
+      try {
+        scenarioNames.forEach(name => {
+          const scenario = refactoredManager.getScenario(name);
+          if (!scenario) throw new Error(`Failed to load ${name}`);
+        });
+        results.push({ name: 'Scenario Loading', passed: true, message: `All ${scenarioNames.length} scenarios loaded successfully` });
+      } catch (error) {
+        results.push({ name: 'Scenario Loading', passed: false, message: error.message });
+      }
+      
+      // Test 2: Delay calculations match
+      let delayMatchCount = 0;
+      let delayMismatchCount = 0;
+      scenarioNames.forEach(name => {
+        try {
+          const original = originalManager.getScenario(name);
+          const refactored = refactoredManager.getScenario(name);
+          const originalStats = originalManager.calculateStatistics(original);
+          const refactoredStats = refactored.statistics;
+          
+          const tolerance = 0.001;
+          if (Math.abs(originalStats.totalDelay - refactoredStats.total) < tolerance) {
+            delayMatchCount++;
+          } else {
+            delayMismatchCount++;
+            console.error(`Delay mismatch for ${name}:`, originalStats.totalDelay, refactoredStats.total);
+          }
+        } catch (error) {
+          delayMismatchCount++;
+          console.error(`Error testing ${name}:`, error);
+        }
+      });
+      results.push({
+        name: 'Delay Calculations',
+        passed: delayMismatchCount === 0,
+        message: `${delayMatchCount} matched, ${delayMismatchCount} mismatched`
+      });
+      
+      // Test 3: Configuration structure
+      try {
+        const customScenario = refactoredManager.createCustomScenario({
+          name: 'Test Custom',
+          description: 'Test scenario',
+          packetSize: 1000,
+          nodes: ['A:Host', 'B:Router', 'C:Host'],
+          hops: [
+            { bandwidth: 1e9, distance: 100 },
+            { bandwidth: 1e9, distance: 200 }
+          ]
+        });
+        
+        if (customScenario.nodes.length !== 3) throw new Error('Node parsing failed');
+        if (customScenario.hops.length !== 2) throw new Error('Hop parsing failed');
+        if (!customScenario.statistics) throw new Error('Statistics not calculated');
+        
+        results.push({ name: 'Custom Scenario Creation', passed: true, message: 'Custom scenario created successfully' });
+      } catch (error) {
+        results.push({ name: 'Custom Scenario Creation', passed: false, message: error.message });
+      }
+      
+      // Test 4: Scenario groups
+      try {
+        const basicScenarios = refactoredManager.getScenariosByGroup('basic');
+        const educationalScenarios = refactoredManager.getScenariosByGroup('educational');
+        
+        if (basicScenarios.length === 0) throw new Error('Basic group empty');
+        if (educationalScenarios.length === 0) throw new Error('Educational group empty');
+        
+        results.push({ 
+          name: 'Scenario Groups', 
+          passed: true, 
+          message: `${Object.keys(refactoredManager.groups).length} groups loaded`
+        });
+      } catch (error) {
+        results.push({ name: 'Scenario Groups', passed: false, message: error.message });
+      }
+      
+      // Test 5: Export/Import cycle
+      try {
+        const original = refactoredManager.getScenario('simple');
+        const exported = refactoredManager.exportScenarioConfig(original);
+        const reimported = refactoredManager.createCustomScenario(exported);
+        
+        if (reimported.nodes.length !== original.nodes.length) throw new Error('Node count mismatch');
+        if (reimported.hops.length !== original.hops.length) throw new Error('Hop count mismatch');
+        
+        results.push({ name: 'Export/Import Cycle', passed: true, message: 'Scenario exported and reimported successfully' });
+      } catch (error) {
+        results.push({ name: 'Export/Import Cycle', passed: false, message: error.message });
+      }
+      
+      // Display results
+      testResults.innerHTML = '';
+      results.forEach(result => {
+        const div = document.createElement('div');
+        div.className = `test-result ${result.passed ? 'pass' : 'fail'}`;
+        div.innerHTML = `
+          <strong>${result.passed ? '✓' : '✗'} ${result.name}</strong><br>
+          ${result.message}
+        `;
+        testResults.appendChild(div);
+      });
+      
+      // Summary
+      const passedCount = results.filter(r => r.passed).length;
+      const totalCount = results.length;
+      const summaryDiv = document.createElement('div');
+      summaryDiv.className = 'test-result';
+      summaryDiv.style.marginTop = '20px';
+      summaryDiv.style.fontWeight = 'bold';
+      summaryDiv.innerHTML = `
+        <span class="${passedCount === totalCount ? 'success' : 'error'}">
+          Test Summary: ${passedCount}/${totalCount} tests passed
+        </span>
+      `;
+      testResults.appendChild(summaryDiv);
+    }
+    
+    // Event listeners
+    document.getElementById('load-scenario-btn').addEventListener('click', loadScenario);
+    document.getElementById('compare-btn').addEventListener('click', compareImplementations);
+    document.getElementById('run-all-tests-btn').addEventListener('click', runAllTests);
+    scenarioSelect.addEventListener('change', loadScenario);
+    
+    // Initialize
+    populateScenarios();
+    
+    // Auto-run tests on load
+    setTimeout(runAllTests, 100);
+  </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive visualization showing how network latency accumulates across hops">
+  <title>Packet Journey - Network Latency Visualization</title>
+  
+  <link rel="stylesheet" href="../../shared/styles/main.css">
+  <link rel="stylesheet" href="./styles/packet-journey.css">
+</head>
+<body>
+  <main>
+    <div class="demo-container">
+      <header class="demo-header">
+        <h1>🌐 Packet Journey: Understanding Network Latency</h1>
+        <p class="demo-description">
+          Explore how latency accumulates as packets travel through a network. 
+          Each hop adds four types of delay: transmission, propagation, processing, and queuing.
+        </p>
+      </header>
+      
+      <div class="demo-layout">
+        <!-- Control Panel -->
+        <aside class="control-panel">
+          <h2>⚙️ Controls</h2>
+          
+          <!-- Preset Selector -->
+          <div class="control-group">
+            <label for="preset-select">Network Preset:</label>
+            <select id="preset-select">
+              <option value="default">Home Internet (Default)</option>
+              <option value="gaming">Gaming Setup (Low Latency)</option>
+              <option value="satellite">Satellite Internet (High Latency)</option>
+              <option value="enterprise">Enterprise Network (Optimized)</option>
+            </select>
+          </div>
+          
+          <!-- Packet Size Control -->
+          <div class="control-group">
+            <label for="packet-size">
+              Packet Size: <span id="packet-size-value">1500</span> bytes
+            </label>
+            <input type="range" id="packet-size" min="64" max="9000" value="1500" step="100">
+            <div class="help-text">Standard MTU is 1500 bytes</div>
+          </div>
+          
+          <!-- Results Summary -->
+          <div id="results-summary" class="results-panel" style="display: none;">
+            <h3>📈 Results</h3>
+            <div class="result-item">
+              <span class="label">Total Latency:</span>
+              <span id="total-latency" class="value">-</span>
+            </div>
+            <div class="result-item">
+              <span class="label">Quality:</span>
+              <span id="quality-rating" class="value">-</span>
+            </div>
+            <div class="result-item">
+              <span class="label">Bottleneck:</span>
+              <span id="bottleneck-hop" class="value">-</span>
+            </div>
+          </div>
+          
+          <!-- Component Breakdown -->
+          <div id="component-breakdown" class="breakdown-panel" style="display: none;">
+            <h3>🔍 Component Totals</h3>
+            <div class="component-item">
+              <span class="component-color" style="background: #3498db;"></span>
+              <span class="label">Transmission:</span>
+              <span id="total-transmission" class="value">-</span>
+            </div>
+            <div class="component-item">
+              <span class="component-color" style="background: #2ecc71;"></span>
+              <span class="label">Propagation:</span>
+              <span id="total-propagation" class="value">-</span>
+            </div>
+            <div class="component-item">
+              <span class="component-color" style="background: #f39c12;"></span>
+              <span class="label">Processing:</span>
+              <span id="total-processing" class="value">-</span>
+            </div>
+            <div class="component-item">
+              <span class="component-color" style="background: #e74c3c;"></span>
+              <span class="label">Queuing:</span>
+              <span id="total-queuing" class="value">-</span>
+            </div>
+          </div>
+          
+        </aside>
+        
+        <!-- Visualization Area -->
+        <section class="visualization-area">
+          <canvas id="network-canvas"></canvas>
+          
+          <!-- Detailed Breakdown Table -->
+          <div id="detailed-breakdown" style="display: none;">
+            <h3>📊 Detailed Hop-by-Hop Breakdown</h3>
+            <p class="table-hint">💡 Click any row to see the detailed equations and calculations</p>
+            <table id="breakdown-table">
+              <thead>
+                <tr>
+                  <th>Hop</th>
+                  <th>Name</th>
+                  <th>Transmission</th>
+                  <th>Propagation</th>
+                  <th>Processing</th>
+                  <th>Queuing</th>
+                  <th>Total</th>
+                  <th>Cumulative</th>
+                </tr>
+              </thead>
+              <tbody id="breakdown-tbody">
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Info Box -->
+          <div class="info-box">
+            <h3>📚 Understanding Latency Components</h3>
+            <dl>
+              <dt>🔷 Transmission Delay</dt>
+              <dd>Time to push packet bits onto the wire (packet_size / bandwidth)</dd>
+              
+              <dt>🟢 Propagation Delay</dt>
+              <dd>Time for signal to travel the physical distance (distance / signal_speed)</dd>
+              
+              <dt>🟠 Processing Delay</dt>
+              <dd>Time to examine headers and make routing decisions</dd>
+              
+              <dt>🔴 Queuing Delay</dt>
+              <dd>Time waiting in buffer before processing</dd>
+            </dl>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

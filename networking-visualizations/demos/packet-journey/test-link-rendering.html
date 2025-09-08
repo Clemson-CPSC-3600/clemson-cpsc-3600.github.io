@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Link Rendering</title>
+  <style>
+    canvas {
+      border: 1px solid #ccc;
+      background: white;
+    }
+    .info {
+      font-family: monospace;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test Link Rendering</h1>
+  <div class="info">Testing if links render between nodes</div>
+  <canvas id="test-canvas" width="800" height="400"></canvas>
+  
+  <script type="module">
+    import { CanvasHelper } from '../../shared/utils/CanvasHelper.js';
+    import { COLORS } from '../../shared/constants/colors.js';
+    
+    const canvas = document.getElementById('test-canvas');
+    const ctx = canvas.getContext('2d');
+    const helper = new CanvasHelper(ctx);
+    
+    // Test 1: Draw a simple line
+    console.log('Test 1: Drawing simple line');
+    ctx.strokeStyle = 'blue';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(50, 50);
+    ctx.lineTo(150, 50);
+    ctx.stroke();
+    
+    // Test 2: Use helper.drawLine
+    console.log('Test 2: Using helper.drawLine');
+    helper.drawLine(50, 100, 150, 100, {
+      color: 'red',
+      width: 3
+    });
+    
+    // Test 3: Use helper.drawLink
+    console.log('Test 3: Using helper.drawLink');
+    helper.drawLink(50, 150, 150, 150, {
+      color: 'green',
+      width: 3,
+      type: 'ethernet'
+    });
+    
+    // Test 4: Draw nodes and links like in the real component
+    console.log('Test 4: Drawing nodes with links');
+    
+    // Node positions
+    const node1 = { x: 250, y: 200 };
+    const node2 = { x: 400, y: 200 };
+    const node3 = { x: 550, y: 200 };
+    
+    // Draw links first
+    helper.drawLink(node1.x, node1.y, node2.x, node2.y, {
+      color: COLORS.LATENCY.GOOD,
+      width: 3
+    });
+    
+    helper.drawLink(node2.x, node2.y, node3.x, node3.y, {
+      color: COLORS.LATENCY.EXCELLENT,
+      width: 3
+    });
+    
+    // Draw nodes on top
+    [node1, node2, node3].forEach((node, i) => {
+      ctx.fillStyle = COLORS.UI.BACKGROUND;
+      ctx.strokeStyle = COLORS.UI.BORDER;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, 30, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      
+      // Add label
+      ctx.fillStyle = COLORS.UI.TEXT;
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`Node ${i + 1}`, node.x, node.y);
+    });
+    
+    // Test 5: Test with exact parameters from CanvasPathRenderer
+    console.log('Test 5: Exact parameters from CanvasPathRenderer');
+    const start = { x: 250, y: 300 };
+    const end = { x: 400, y: 300 };
+    const nodeRadius = 30;
+    
+    // Calculate link endpoints (from edge of nodes)
+    const angle = Math.atan2(end.y - start.y, end.x - start.x);
+    const startX = start.x + Math.cos(angle) * nodeRadius;
+    const startY = start.y + Math.sin(angle) * nodeRadius;
+    const endX = end.x - Math.cos(angle) * nodeRadius;
+    const endY = end.y - Math.sin(angle) * nodeRadius;
+    
+    console.log('Link coordinates:', { startX, startY, endX, endY });
+    
+    // Draw link
+    helper.drawLink(startX, startY, endX, endY, {
+      color: COLORS.LATENCY.POOR,
+      width: 3,
+      style: 'solid'  // This parameter isn't used but testing anyway
+    });
+    
+    // Draw the nodes
+    [start, end].forEach(pos => {
+      ctx.fillStyle = '#f0f0f0';
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, nodeRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+    
+    console.log('All tests complete. Check canvas for visual results.');
+  </script>
+</body>
+</html>

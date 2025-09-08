@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Hover Tooltip - Packet Journey</title>
+  <link rel="stylesheet" href="../../shared/styles/base.css">
+  <link rel="stylesheet" href="../../shared/styles/components.css">
+  <link rel="stylesheet" href="styles/journey.css">
+  <style>
+    .test-info {
+      background: #f0f8ff;
+      border: 2px solid #0066cc;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    .test-info h3 {
+      margin-top: 0;
+      color: #0066cc;
+    }
+    .test-info ul {
+      margin: 10px 0;
+    }
+    .test-info li {
+      margin: 5px 0;
+    }
+    .success {
+      color: #2ecc71;
+      font-weight: bold;
+    }
+    .feature {
+      background: #e8f5e9;
+      padding: 3px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="page-header">
+      <h1>🧪 Hover Tooltip Test</h1>
+      <p>Testing the interactive hover effects on the latency visualization chart</p>
+    </header>
+
+    <div class="test-info">
+      <h3>✨ What's New</h3>
+      <ul>
+        <li class="success">✓ Hover detection for stacked bar chart</li>
+        <li class="success">✓ Detailed tooltip showing individual delay contributions</li>
+        <li class="success">✓ Dynamic positioning to keep tooltip on screen</li>
+        <li class="success">✓ Color-coded delay components in tooltip</li>
+      </ul>
+      
+      <h3>🎯 How to Test</h3>
+      <ol>
+        <li>Select any scenario from the dropdown</li>
+        <li><strong>Hover over the colored bars</strong> in the latency chart below the network diagram</li>
+        <li>You should see a <span class="feature">dark tooltip</span> appear showing:
+          <ul>
+            <li>Node name at the top</li>
+            <li>Individual delay components (Transmission, Propagation, Processing, Queuing)</li>
+            <li>Each component's value formatted appropriately (μs, ms)</li>
+            <li>Total delay at the bottom with a separator line</li>
+          </ul>
+        </li>
+        <li>Move your mouse across different bars to see different breakdowns</li>
+        <li>The tooltip should follow your mouse and stay on screen even near edges</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Interactive Packet Journey Visualization</h2>
+        <div class="controls">
+          <select id="scenario-select" class="control-select">
+            <option value="">Loading scenarios...</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <div class="visualization-container">
+          <canvas id="journey-canvas"></canvas>
+        </div>
+        
+        <div id="stats-panel" class="stats-panel" style="display: none;">
+          <h3>Journey Statistics</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">Total Latency:</span>
+              <span class="stat-value" id="stat-total">-</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Hops:</span>
+              <span class="stat-value" id="stat-hops">-</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Distance:</span>
+              <span class="stat-value" id="stat-distance">-</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Bottleneck:</span>
+              <span class="stat-value" id="stat-bottleneck">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-info" style="background: #fffef0; border-color: #ffb300;">
+      <h3>🔍 Debug Console</h3>
+      <p>Open your browser's developer console (F12) to see detailed logging about:</p>
+      <ul>
+        <li>Bar regions being registered</li>
+        <li>Hover detection events</li>
+        <li>Tooltip rendering calls</li>
+        <li>Individual delay calculations</li>
+      </ul>
+    </div>
+  </main>
+
+  <!-- Import the refactored components -->
+  <script type="module">
+    import { VisualizationOrchestrator } from './js/components/VisualizationOrchestrator.js';
+    import { ScenarioManager } from './js/components/ScenarioManager.js';
+    import { StatsPanel } from './js/components/StatsPanel.js';
+    import { journeyScenarios } from './js/configs/journeyScenarios.js';
+    
+    // Log that test is starting
+    console.log('🧪 Hover Tooltip Test Starting...');
+    console.log('📊 Features being tested:');
+    console.log('  - Bar hover detection');
+    console.log('  - Tooltip rendering');
+    console.log('  - Individual delay breakdowns');
+    console.log('  - Dynamic positioning');
+    
+    // Initialize components
+    const orchestrator = new VisualizationOrchestrator('journey-canvas');
+    const scenarioManager = new ScenarioManager('scenario-select', journeyScenarios);
+    const statsPanel = new StatsPanel('stats-panel');
+    
+    // Handle scenario changes
+    scenarioManager.onChange((scenario) => {
+      console.log('📍 Loading scenario:', scenario.id);
+      orchestrator.update(scenario);
+      statsPanel.update(scenario);
+      document.getElementById('stats-panel').style.display = 'block';
+    });
+    
+    // Load initial scenario
+    const initialScenario = scenarioManager.getScenario('local-network');
+    if (initialScenario) {
+      console.log('✅ Initial scenario loaded');
+      orchestrator.update(initialScenario);
+      statsPanel.update(initialScenario);
+      document.getElementById('stats-panel').style.display = 'block';
+    }
+    
+    // Add extra logging for hover events
+    const originalCheckHover = orchestrator.latencyVisualizer.checkHover.bind(orchestrator.latencyVisualizer);
+    orchestrator.latencyVisualizer.checkHover = function(x, y) {
+      const result = originalCheckHover(x, y);
+      if (result) {
+        console.log('🎯 Bar hover detected:', {
+          node: result.node,
+          total: result.total,
+          delays: result.delays.map(d => `${d.type}: ${d.value.toFixed(3)}ms`)
+        });
+      }
+      return result;
+    };
+    
+    console.log('✨ Test page ready! Try hovering over the colored bars in the chart.');
+  </script>
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shared Utilities Test Suite</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    h1 {
+      color: #2c3e50;
+      border-bottom: 3px solid #3498db;
+      padding-bottom: 10px;
+    }
+    
+    h2 {
+      color: #34495e;
+      margin-top: 30px;
+      border-bottom: 1px solid #bdc3c7;
+      padding-bottom: 5px;
+    }
+    
+    .test-section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .test-case {
+      margin: 15px 0;
+      padding: 10px;
+      border-left: 4px solid #ecf0f1;
+    }
+    
+    .test-case.pass {
+      border-left-color: #27ae60;
+      background: #f0fdf4;
+    }
+    
+    .test-case.fail {
+      border-left-color: #e74c3c;
+      background: #fef2f2;
+    }
+    
+    .test-name {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+    
+    .test-result {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+    
+    .test-expected {
+      color: #7f8c8d;
+    }
+    
+    .test-actual {
+      color: #34495e;
+      font-weight: 500;
+    }
+    
+    .test-error {
+      color: #e74c3c;
+      font-family: monospace;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+    
+    .summary {
+      background: #34495e;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .summary.all-pass {
+      background: #27ae60;
+    }
+    
+    .summary.some-fail {
+      background: #e74c3c;
+    }
+    
+    .stats {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .stat {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+    
+    #animation-test {
+      height: 100px;
+      background: white;
+      border: 1px solid #bdc3c7;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    
+    .animation-ball {
+      width: 20px;
+      height: 20px;
+      background: #3498db;
+      border-radius: 50%;
+      position: absolute;
+      top: 40px;
+      transition: none;
+    }
+    
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    
+    button:hover {
+      background: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Shared Utilities Test Suite</h1>
+  
+  <div id="summary" class="summary">
+    <div>
+      <strong>Test Results</strong>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-value" id="total-tests">0</span>
+        <span class="stat-label">Total</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="passed-tests">0</span>
+        <span class="stat-label">Passed</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="failed-tests">0</span>
+        <span class="stat-label">Failed</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="test-section">
+    <h2>NetworkFormatter Tests</h2>
+    <div id="formatter-tests"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>DelayCalculator Tests</h2>
+    <div id="calculator-tests"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>SVGBuilder Tests</h2>
+    <svg id="svg-test" width="200" height="100" style="border: 1px solid #ddd;"></svg>
+    <div id="svg-tests"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>AnimationController Tests</h2>
+    <div id="animation-test">
+      <div class="animation-ball" id="ball"></div>
+    </div>
+    <div>
+      <button id="start-animation">Start</button>
+      <button id="pause-animation">Pause</button>
+      <button id="stop-animation">Stop</button>
+      <button id="speed-up">Speed 2x</button>
+      <button id="speed-normal">Speed 1x</button>
+    </div>
+    <div id="animation-tests"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Constants Tests</h2>
+    <div id="constants-tests"></div>
+  </div>
+
+  <script type="module">
+    import { NetworkFormatter } from '../utils/NetworkFormatter.js';
+    import { DelayCalculator } from '../utils/DelayCalculator.js';
+    import { SVGBuilder } from '../utils/SVGBuilder.js';
+    import { AnimationController } from '../utils/AnimationController.js';
+    import { COLORS, withOpacity, getGradientColor } from '../constants/colors.js';
+    import { SIZES, getResponsiveSize } from '../constants/sizes.js';
+    import { NETWORK, getBandwidthCategory, getLatencyQuality } from '../constants/network.js';
+    
+    // Test tracking
+    let totalTests = 0;
+    let passedTests = 0;
+    let failedTests = 0;
+    
+    // Test helper functions
+    function runTest(name, fn, container) {
+      totalTests++;
+      const testDiv = document.createElement('div');
+      testDiv.className = 'test-case';
+      
+      try {
+        const result = fn();
+        if (result === true) {
+          passedTests++;
+          testDiv.className += ' pass';
+          testDiv.innerHTML = `
+            <div class="test-name">✓ ${name}</div>
+          `;
+        } else {
+          failedTests++;
+          testDiv.className += ' fail';
+          testDiv.innerHTML = `
+            <div class="test-name">✗ ${name}</div>
+            <div class="test-error">Test returned false</div>
+          `;
+        }
+      } catch (error) {
+        failedTests++;
+        testDiv.className += ' fail';
+        testDiv.innerHTML = `
+          <div class="test-name">✗ ${name}</div>
+          <div class="test-error">${error.message}</div>
+        `;
+      }
+      
+      container.appendChild(testDiv);
+      updateSummary();
+    }
+    
+    function updateSummary() {
+      document.getElementById('total-tests').textContent = totalTests;
+      document.getElementById('passed-tests').textContent = passedTests;
+      document.getElementById('failed-tests').textContent = failedTests;
+      
+      const summary = document.getElementById('summary');
+      summary.className = 'summary ' + (failedTests === 0 ? 'all-pass' : 'some-fail');
+    }
+    
+    function assertEq(actual, expected, message) {
+      if (actual !== expected) {
+        throw new Error(`${message || 'Assertion failed'}: expected ${expected}, got ${actual}`);
+      }
+      return true;
+    }
+    
+    function assertClose(actual, expected, tolerance = 0.01, message) {
+      if (Math.abs(actual - expected) > tolerance) {
+        throw new Error(`${message || 'Assertion failed'}: expected ${expected}±${tolerance}, got ${actual}`);
+      }
+      return true;
+    }
+    
+    function assertExists(obj, message) {
+      if (!obj) {
+        throw new Error(message || 'Object does not exist');
+      }
+      return true;
+    }
+    
+    // NetworkFormatter Tests
+    const formatterTests = document.getElementById('formatter-tests');
+    
+    runTest('Format bandwidth - Gbps', () => {
+      return assertEq(NetworkFormatter.bandwidth(1e9), '1Gbps');
+    }, formatterTests);
+    
+    runTest('Format bandwidth - Mbps', () => {
+      return assertEq(NetworkFormatter.bandwidth(100e6), '100Mbps');
+    }, formatterTests);
+    
+    runTest('Format bandwidth - Kbps', () => {
+      return assertEq(NetworkFormatter.bandwidth(56e3), '56Kbps');
+    }, formatterTests);
+    
+    runTest('Format distance - kilometers', () => {
+      return assertEq(NetworkFormatter.distance(5000), '5.0km');
+    }, formatterTests);
+    
+    runTest('Format distance - meters', () => {
+      return assertEq(NetworkFormatter.distance(100), '100m');
+    }, formatterTests);
+    
+    runTest('Format time - milliseconds', () => {
+      return assertEq(NetworkFormatter.time(1.5), '1.50ms');
+    }, formatterTests);
+    
+    runTest('Format time - microseconds', () => {
+      return assertEq(NetworkFormatter.time(0.0005), '500.0μs');
+    }, formatterTests);
+    
+    runTest('Format data size - MB', () => {
+      return assertEq(NetworkFormatter.dataSize(10485760), '10.0MB');
+    }, formatterTests);
+    
+    runTest('Format percentage', () => {
+      return assertEq(NetworkFormatter.percentage(0.755), '75.5%');
+    }, formatterTests);
+    
+    runTest('Format packet loss', () => {
+      return assertEq(NetworkFormatter.packetLoss(5, 1000), '0.50% loss');
+    }, formatterTests);
+    
+    // DelayCalculator Tests
+    const calculatorTests = document.getElementById('calculator-tests');
+    
+    runTest('Calculate transmission delay', () => {
+      const hop = { bandwidth: 100e6, distance: 1000 };
+      const delays = DelayCalculator.calculateHopDelays(hop, 1500);
+      return assertClose(delays.transmission, 0.12, 0.01, 'Transmission delay');
+    }, calculatorTests);
+    
+    runTest('Calculate propagation delay', () => {
+      const hop = { distance: 1000, propagationSpeed: 2e8 };
+      const delays = DelayCalculator.calculateHopDelays(hop, 1500);
+      return assertClose(delays.propagation, 0.005, 0.001, 'Propagation delay');
+    }, calculatorTests);
+    
+    runTest('Calculate total scenario delay', () => {
+      const scenario = {
+        packetSize: 1500,
+        hops: [
+          { bandwidth: 100e6, distance: 1000, processingDelay: 0.5 },
+          { bandwidth: 1e9, distance: 5000, processingDelay: 0.1 }
+        ]
+      };
+      const totals = DelayCalculator.calculateScenarioTotalDelay(scenario);
+      return totals.total > 0;
+    }, calculatorTests);
+    
+    runTest('Calculate RTT', () => {
+      const scenario = {
+        packetSize: 1500,
+        hops: [{ bandwidth: 100e6, distance: 1000 }]
+      };
+      const rtt = DelayCalculator.calculateRTT(scenario);
+      return rtt > 0;
+    }, calculatorTests);
+    
+    runTest('Calculate BDP', () => {
+      const bdp = DelayCalculator.calculateBDP(1e9, 10);
+      return assertEq(bdp.packets, 834, 'BDP packets');
+    }, calculatorTests);
+    
+    runTest('Find dominant delay', () => {
+      const delays = {
+        transmission: 5,
+        propagation: 20,
+        processing: 1,
+        queuing: 2
+      };
+      return assertEq(DelayCalculator.findDominantDelay(delays), 'propagation');
+    }, calculatorTests);
+    
+    // SVGBuilder Tests
+    const svgTests = document.getElementById('svg-tests');
+    const svgElement = document.getElementById('svg-test');
+    const svg = new SVGBuilder(svgElement);
+    
+    runTest('Create SVG circle', () => {
+      const circle = svg.circle(50, 50, 20, { fill: COLORS.PACKET.DEFAULT });
+      return assertExists(circle) && assertEq(circle.tagName, 'circle');
+    }, svgTests);
+    
+    runTest('Create SVG line', () => {
+      const line = svg.line(10, 10, 90, 90, { stroke: COLORS.LINKS.ETHERNET });
+      return assertExists(line) && assertEq(line.tagName, 'line');
+    }, svgTests);
+    
+    runTest('Create SVG text', () => {
+      const text = svg.text(100, 20, 'Test', { fill: COLORS.UI.TEXT });
+      return assertExists(text) && assertEq(text.textContent, 'Test');
+    }, svgTests);
+    
+    runTest('Create arrow marker', () => {
+      const marker = svg.createArrowMarker('test-arrow', COLORS.UI.AXIS);
+      return assertExists(marker) && assertEq(marker.tagName, 'marker');
+    }, svgTests);
+    
+    runTest('Transform helper', () => {
+      const transform = SVGBuilder.transform({
+        translate: [10, 20],
+        rotate: 45,
+        scale: 1.5
+      });
+      return transform.includes('translate') && transform.includes('rotate');
+    }, svgTests);
+    
+    // AnimationController Tests
+    const animationTests = document.getElementById('animation-tests');
+    const controller = new AnimationController();
+    const ball = document.getElementById('ball');
+    let ballPosition = 0;
+    
+    runTest('Register animation', () => {
+      controller.register('ball-move', (dt) => {
+        ballPosition += dt * 0.05;
+        if (ballPosition > 180) ballPosition = 0;
+        ball.style.left = ballPosition + 'px';
+      });
+      return controller.has('ball-move');
+    }, animationTests);
+    
+    runTest('Animation state management', () => {
+      controller.start();
+      const stats1 = controller.getStats();
+      controller.pause();
+      const stats2 = controller.getStats();
+      controller.stop();
+      return stats1.isRunning && stats2.isPaused;
+    }, animationTests);
+    
+    runTest('Set animation speed', () => {
+      controller.setSpeed(2.0);
+      return assertEq(controller.speed, 2.0);
+    }, animationTests);
+    
+    runTest('Unregister animation', () => {
+      controller.register('temp', () => {});
+      const hadTemp = controller.has('temp');
+      controller.unregister('temp');
+      return hadTemp && !controller.has('temp');
+    }, animationTests);
+    
+    runTest('Easing functions exist', () => {
+      const easings = ['linear', 'easeInQuad', 'easeOutQuad', 'easeInOutCubic'];
+      return easings.every(name => typeof AnimationController.Easing[name] === 'function');
+    }, animationTests);
+    
+    // Set up animation control buttons
+    document.getElementById('start-animation').onclick = () => controller.start();
+    document.getElementById('pause-animation').onclick = () => controller.pause();
+    document.getElementById('stop-animation').onclick = () => {
+      controller.stop();
+      ballPosition = 0;
+      ball.style.left = '0px';
+    };
+    document.getElementById('speed-up').onclick = () => controller.setSpeed(2.0);
+    document.getElementById('speed-normal').onclick = () => controller.setSpeed(1.0);
+    
+    // Constants Tests
+    const constantsTests = document.getElementById('constants-tests');
+    
+    runTest('Colors constants exist', () => {
+      return assertExists(COLORS.PACKET.TCP) && 
+             assertExists(COLORS.DELAYS.PROPAGATION) &&
+             assertExists(COLORS.UI.BACKGROUND);
+    }, constantsTests);
+    
+    runTest('withOpacity helper', () => {
+      const color = withOpacity('#3498db', 0.5);
+      return color.includes('rgba') && color.includes('0.5');
+    }, constantsTests);
+    
+    runTest('getGradientColor helper', () => {
+      const gradient = COLORS.GRADIENTS.SPEED;
+      const color = getGradientColor(gradient, 0.5);
+      return assertExists(color);
+    }, constantsTests);
+    
+    runTest('Sizes constants exist', () => {
+      return assertEq(SIZES.PACKET.RADIUS, 10) &&
+             assertExists(SIZES.NODE.ROUTER) &&
+             assertExists(SIZES.FONTS.TITLE);
+    }, constantsTests);
+    
+    runTest('getResponsiveSize helper', () => {
+      const sizes = {
+        mobile: 10,
+        tablet: 15,
+        desktop: 20,
+        default: 15
+      };
+      const size = getResponsiveSize(sizes, 800);
+      return assertEq(size, 20);
+    }, constantsTests);
+    
+    runTest('Network constants exist', () => {
+      return assertEq(NETWORK.PROPAGATION_SPEED.FIBER, 2e8) &&
+             assertExists(NETWORK.BANDWIDTH.ETHERNET_1G) &&
+             assertEq(NETWORK.PACKET_SIZE.DEFAULT, 1500);
+    }, constantsTests);
+    
+    runTest('getBandwidthCategory helper', () => {
+      return assertEq(getBandwidthCategory(1e9), 'Gigabit') &&
+             assertEq(getBandwidthCategory(100e6), 'Fast Ethernet');
+    }, constantsTests);
+    
+    runTest('getLatencyQuality helper', () => {
+      return assertEq(getLatencyQuality(10), 'Excellent') &&
+             assertEq(getLatencyQuality(150), 'Poor');
+    }, constantsTests);
+    
+    // Final summary
+    console.log(`Tests complete: ${passedTests}/${totalTests} passed`);
+  </script>
+</body>
+</html>

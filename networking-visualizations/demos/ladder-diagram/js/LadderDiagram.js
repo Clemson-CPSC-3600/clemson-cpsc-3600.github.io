@@ -8,6 +8,9 @@ export class LadderDiagram {
     this.width = 800;
     this.height = 600;
     
+    // Visualization mode: 'single' or 'multi'
+    this.visualizationMode = 'single';
+    
     // Margins for axis labels
     this.margin = {
       top: 80,  // Increased to accommodate link information
@@ -81,8 +84,27 @@ export class LadderDiagram {
     // Calculate packet path segments first to determine actual time needed
     this.segments = this.calculateSegments(scenario);
     
-    // Calculate actual max time from segments with some padding
-    if (this.segments.length > 0) {
+    // Calculate actual max time - this should be the time for ONE packet to traverse the network
+    // regardless of whether we're in single or multi-packet mode
+    let calculatedMaxTime = 0;
+    const packetSizeBits = scenario.packetSize * 8;
+    
+    // Calculate total time for a single packet to traverse all hops
+    for (const hop of scenario.hops) {
+      // Add all delay components
+      if (hop.queuingDelay) calculatedMaxTime += hop.queuingDelay;
+      if (hop.bandwidth) calculatedMaxTime += (packetSizeBits / hop.bandwidth) * 1000;
+      if (hop.distance && hop.propagationSpeed) {
+        calculatedMaxTime += (hop.distance / hop.propagationSpeed) * 1000;
+      }
+      if (hop.processingDelay) calculatedMaxTime += hop.processingDelay;
+    }
+    
+    // Use calculated time if available, otherwise fall back to segments
+    if (calculatedMaxTime > 0) {
+      this.maxTime = calculatedMaxTime * 1.1; // Add 10% padding at bottom
+      console.log(`Setting maxTime to ${this.maxTime}ms based on calculated single packet time of ${calculatedMaxTime}ms`);
+    } else if (this.segments.length > 0) {
       let maxTime = 0;
       this.segments.forEach(segment => {
         if (segment.type === 'transmission-propagation') {
@@ -105,6 +127,20 @@ export class LadderDiagram {
     this.drawAxes();
     this.drawNodeLines();
     this.drawPath();
+  }
+  
+  /**
+   * Update scales and redraw grid for multi-packet mode
+   */
+  updateTimeScale(maxTime) {
+    this.maxTime = maxTime;
+    this.timeScale = this.createLinearScale(0, this.maxTime, 0, this.plotHeight);
+    
+    // Clear and redraw grid and axes
+    this.gridGroup.innerHTML = '';
+    this.axisGroup.innerHTML = '';
+    this.drawGrid();
+    this.drawAxes();
   }
   
   /**
@@ -623,24 +659,49 @@ export class LadderDiagram {
   }
   
   /**
-   * Update packet position based on current time
-   * Now shows a time line moving down the diagram
+   * Set visualization mode for single or multi-packet display
    */
-  updatePacketPosition(time) {
-    this.currentTime = time;
+  setVisualizationMode(mode) {
+    this.visualizationMode = mode; // 'single' or 'multi'
+  }
+  
+  /**
+   * Unified update method that handles both single and multi-packet visualization
+   */
+  updatePackets(state) {
+    this.currentTime = state.time;
     
     // Clear existing packet/time visualization
     this.packetGroup.innerHTML = '';
     
     // Draw the current time line
-    this.drawTimeLine(time);
+    this.drawTimeLine(state.time);
     
-    // Find and highlight active segments
+    // Choose visualization based on mode and packet count
+    if (this.visualizationMode === 'single' && state.packets.length === 1) {
+      // Single packet mode - show detailed first/last bit visualization
+      this.drawSinglePacketDetailed(state.packets[0], state.time);
+    } else {
+      // Multi-packet mode - show simplified packet indicators
+      this.drawMultiplePacketsSimplified(state);
+    }
+    
+    // Add shading to show "past" events
+    this.shadePastEvents(state.time);
+  }
+  
+  /**
+   * Draw detailed single packet visualization with first and last bit tracking
+   */
+  drawSinglePacketDetailed(packet, time) {
+    // Find and highlight active segments based on packet timing
+    const packetTime = time - packet.sendTime;
     let activeSegment = null;
+    
     for (const segment of this.segments) {
       if (segment.type === 'transmission-propagation') {
         // Check if this segment is active
-        if (time >= segment.firstBitStart && time <= segment.lastBitEnd) {
+        if (packetTime >= segment.firstBitStart && packetTime <= segment.lastBitEnd) {
           activeSegment = segment;
           
           // Show where packets are at this moment in time
@@ -648,36 +709,35 @@ export class LadderDiagram {
           const endX = this.nodeScale(segment.endNode);
           
           // Mark where the first bit is (if still traveling)
-          if (time >= segment.firstBitStart && time <= segment.firstBitEnd) {
-            const progress = (time - segment.firstBitStart) / segment.propagationTime;
+          if (packetTime >= segment.firstBitStart && packetTime <= segment.firstBitEnd) {
+            const progress = (packetTime - segment.firstBitStart) / segment.propagationTime;
             const x = startX + (endX - startX) * progress;
-            this.drawTimeIntersection(x, this.timeScale(time), 'first-bit');
+            this.drawTimeIntersection(x, this.timeScale(packetTime), 'first-bit');
           }
           
           // Mark where the last bit is (if it has started)
-          if (time >= segment.lastBitStart && time <= segment.lastBitEnd) {
-            const progress = (time - segment.lastBitStart) / segment.propagationTime;
+          if (packetTime >= segment.lastBitStart && packetTime <= segment.lastBitEnd) {
+            const progress = (packetTime - segment.lastBitStart) / segment.propagationTime;
             const x = startX + (endX - startX) * progress;
-            this.drawTimeIntersection(x, this.timeScale(time), 'last-bit');
+            this.drawTimeIntersection(x, this.timeScale(packetTime), 'last-bit');
             
             // If transmission delay is very small, ensure both bits are visible
-            // by drawing the first bit marker at a slightly different position
-            if (segment.transmissionTime < 0.001 && time >= segment.firstBitStart && time <= segment.firstBitEnd) {
-              const firstProgress = (time - segment.firstBitStart) / segment.propagationTime;
+            if (segment.transmissionTime < 0.001 && packetTime >= segment.firstBitStart && packetTime <= segment.firstBitEnd) {
+              const firstProgress = (packetTime - segment.firstBitStart) / segment.propagationTime;
               const firstX = startX + (endX - startX) * firstProgress;
               // Offset the first bit marker slightly to the right if they overlap
               if (Math.abs(firstX - x) < 5) {
-                this.drawTimeIntersection(firstX + 10, this.timeScale(time), 'first-bit');
+                this.drawTimeIntersection(firstX + 10, this.timeScale(packetTime), 'first-bit');
               }
             }
           }
         }
       } else if (segment.type === 'processing' || segment.type === 'queuing') {
         // Check if packet is in processing or queuing
-        if (time >= segment.startTime && time <= segment.endTime) {
+        if (packetTime >= segment.startTime && packetTime <= segment.endTime) {
           activeSegment = segment;
           const nodeX = this.nodeScale(segment.startNode);
-          this.drawTimeIntersection(nodeX, this.timeScale(time), segment.type);
+          this.drawTimeIntersection(nodeX, this.timeScale(packetTime), segment.type);
         }
       }
     }
@@ -685,9 +745,382 @@ export class LadderDiagram {
     if (activeSegment) {
       this.highlightSegment(activeSegment);
     }
+  }
+  
+  /**
+   * Draw simplified multi-packet visualization
+   */
+  drawMultiplePacketsSimplified(state) {
+    // Draw each packet
+    for (const packet of state.packets) {
+      if (packet.phase === 'waiting' || packet.phase === 'delivered') continue;
+      
+      this.drawPacket(packet, state.time);
+    }
     
-    // Add shading to show "past" events
-    this.shadePastEvents(time);
+    // Draw queue indicators
+    for (let i = 0; i < state.queues.length; i++) {
+      const queue = state.queues[i];
+      if (queue.queueLength > 0 || queue.transmitting) {
+        this.drawQueueIndicator(i, queue);
+      }
+    }
+  }
+  
+  /**
+   * Legacy method for backwards compatibility - redirects to unified method
+   * @deprecated Use updatePackets() instead
+   */
+  updatePacketPosition(time) {
+    // Convert to state format and call unified method
+    this.updatePackets({
+      time: time,
+      packets: [{
+        id: 1,
+        phase: 'propagating',
+        hop: 0,
+        progress: 0,
+        color: '#2ecc71',
+        sendTime: 0,
+        size: this.scenario.packetSize
+      }],
+      queues: []
+    });
+  }
+  
+  /**
+   * Legacy method for backwards compatibility - redirects to unified method
+   * @deprecated Use updatePackets() instead
+   */
+  updateMultiplePackets(state) {
+    this.updatePackets(state);
+  }
+  
+  /**
+   * Draw a single packet on the diagram
+   */
+  drawPacket(packet, currentTime) {
+    const packetSizeBits = packet.size * 8;
+    
+    // For multi-packet mode, we need to properly handle the packet's position on the diagram
+    // The packet's Y position should be based on how long it has been traveling,
+    // not the absolute simulation time
+    
+    // Calculate accumulated time using the same logic as getAccumulatedTime
+    let accumulatedTime = 0;
+    
+    // First, handle completed hops (all phases complete)
+    for (let h = 0; h < packet.hop; h++) {
+      const hop = this.scenario.hops[h];
+      // Add all delay components for completed hops
+      if (h > 0 && hop.queuingDelay) {
+        accumulatedTime += hop.queuingDelay;
+      }
+      if (hop.bandwidth) {
+        accumulatedTime += (packetSizeBits / hop.bandwidth) * 1000;
+      }
+      if (hop.distance && hop.propagationSpeed) {
+        accumulatedTime += (hop.distance / hop.propagationSpeed) * 1000;
+      }
+      if (hop.processingDelay) {
+        accumulatedTime += hop.processingDelay;
+      }
+    }
+    
+    // Now handle the current hop based on the current phase
+    const currentHop = this.scenario.hops[packet.hop];
+    if (currentHop) {
+      // Queuing happens at the beginning of each hop (except hop 0)
+      if (packet.hop > 0) {
+        if (packet.phase === 'queuing') {
+          // Currently in queuing phase
+          accumulatedTime += currentHop.queuingDelay * packet.progress;
+        } else if (packet.phase !== 'waiting') {
+          // Past queuing phase
+          accumulatedTime += currentHop.queuingDelay || 0;
+        }
+      }
+      
+      // Transmission
+      if (packet.phase === 'transmitting') {
+        // Currently transmitting
+        const transmissionTime = (packetSizeBits / currentHop.bandwidth) * 1000;
+        accumulatedTime += transmissionTime * packet.progress;
+      } else if (packet.phase === 'propagating' || packet.phase === 'processing') {
+        // Past transmission phase
+        if (currentHop.bandwidth) {
+          accumulatedTime += (packetSizeBits / currentHop.bandwidth) * 1000;
+        }
+      }
+      
+      // Propagation
+      if (packet.phase === 'propagating') {
+        // Currently propagating
+        const propagationTime = (currentHop.distance / currentHop.propagationSpeed) * 1000;
+        accumulatedTime += propagationTime * packet.progress;
+      } else if (packet.phase === 'processing') {
+        // Past propagation phase
+        if (currentHop.distance && currentHop.propagationSpeed) {
+          accumulatedTime += (currentHop.distance / currentHop.propagationSpeed) * 1000;
+        }
+      }
+      
+      // Processing
+      if (packet.phase === 'processing') {
+        // Currently processing
+        accumulatedTime += currentHop.processingDelay * packet.progress;
+      }
+    }
+    
+    // Only log key transitions
+    if (packet.phase === 'propagating' && packet.progress < 0.1) {
+      console.log(`Packet ${packet.id} starting propagation: accumTime=${accumulatedTime.toFixed(2)}ms, Y=${this.timeScale(accumulatedTime)}`)
+    }
+    
+    // Handle waiting packets at the source
+    if (packet.phase === 'waiting') {
+      const sourceNode = this.scenario.nodes[0];
+      if (sourceNode) {
+        const sourceX = this.nodeScale(sourceNode.name);
+        // Show at time 0 (top of diagram) since it hasn't started yet
+        const y = this.timeScale(0);
+        this.drawPacketIndicator(sourceX, y, packet.color, 'waiting');
+      }
+      return;
+    }
+    
+    // Don't draw packets that have traveled beyond the diagram
+    if (accumulatedTime > this.maxTime) {
+      console.log(`Packet ${packet.id} beyond diagram (accumTime=${accumulatedTime} > maxTime=${this.maxTime})`);
+      return;
+    }
+    
+    // Calculate packet position based on phase and hop
+    if (packet.hop < 0 || packet.hop >= this.scenario.hops.length) {
+      console.log(`Packet ${packet.id} invalid hop: ${packet.hop}`);
+      return;
+    }
+    
+    const hop = this.scenario.hops[packet.hop];
+    const startNode = this.scenario.nodes[packet.hop];
+    const endNode = this.scenario.nodes[packet.hop + 1];
+    
+    if (!startNode || !endNode) {
+      console.log(`Packet ${packet.id} missing nodes for hop ${packet.hop}`);
+      return;
+    }
+    
+    const startX = this.nodeScale(startNode.name);
+    const endX = this.nodeScale(endNode.name);
+    
+    // Calculate Y positions based on packet send time and current phase
+    let firstBitY, lastBitY;
+    
+    if (packet.phase === 'transmitting') {
+      // During transmission, bits are being sent
+      const transmissionTime = (packetSizeBits / hop.bandwidth) * 1000;
+      const transmissionStart = this.getAccumulatedTime(packet.hop, 'transmission');
+      
+      // Use relative time from when packet was sent
+      firstBitY = this.timeScale(transmissionStart);
+      lastBitY = this.timeScale(transmissionStart + transmissionTime * packet.progress);
+      
+      // Draw vertical line at source showing transmission
+      this.drawPacketSegment(startX, firstBitY, startX, lastBitY, packet.color, packet.id);
+      
+    } else if (packet.phase === 'propagating') {
+      // During propagation, packet travels through medium
+      const transmissionTime = hop.bandwidth ? (packetSizeBits / hop.bandwidth) * 1000 : 0;
+      const propagationTime = (hop.distance / hop.propagationSpeed) * 1000;
+      const propagationStart = this.getAccumulatedTime(packet.hop, 'propagation');
+      
+      // Calculate current X position based on progress
+      const currentX = startX + (endX - startX) * packet.progress;
+      
+      // Calculate Y position based on accumulated time
+      const currentY = this.timeScale(accumulatedTime);
+      
+      console.log(`Packet ${packet.id} propagating: X=${currentX.toFixed(1)}, Y=${currentY.toFixed(1)}, progress=${packet.progress.toFixed(3)}, color=${packet.color}`);
+      
+      // Draw the packet indicator at its current position
+      this.drawPacketIndicator(currentX, currentY, packet.color, 'propagating');
+      
+      // Optionally draw the propagation line trail  
+      // First bit line
+      if (packet.progress > 0) {
+        const firstBitStartY = this.timeScale(propagationStart);
+        const firstBitEndY = this.timeScale(propagationStart + propagationTime * packet.progress);
+        
+        const line = this.createSVGElement('line', {
+          x1: startX,
+          y1: firstBitStartY,
+          x2: currentX,
+          y2: firstBitEndY,
+          stroke: packet.color,
+          'stroke-width': 2,
+          opacity: 0.3,
+          'stroke-dasharray': '2,2'
+        });
+        this.packetGroup.appendChild(line);
+      }
+      
+      // Last bit line (if transmission delay exists)
+      const lastBitProgress = Math.max(0, packet.progress - (transmissionTime / propagationTime));
+      if (lastBitProgress > 0) {
+        const lastBitX = startX + (endX - startX) * lastBitProgress;
+        const lastBitStartY = this.timeScale(propagationStart + transmissionTime);
+        const lastBitEndY = this.timeScale(propagationStart + transmissionTime + propagationTime * lastBitProgress);
+        
+        const line = this.createSVGElement('line', {
+          x1: startX,
+          y1: lastBitStartY,
+          x2: lastBitX,
+          y2: lastBitEndY,
+          stroke: packet.color,
+          'stroke-width': 2,
+          opacity: 0.3,
+          'stroke-dasharray': '2,2'
+        });
+        this.packetGroup.appendChild(line);
+      }
+      
+    } else if (packet.phase === 'processing') {
+      // During processing, packet is at destination node of current hop
+      const nodeX = this.nodeScale(endNode.name);
+      const y = this.timeScale(accumulatedTime);
+      
+      this.drawPacketIndicator(nodeX, y, packet.color, 'processing');
+      
+    } else if (packet.phase === 'queuing') {
+      // During queuing, packet waits at start node of current hop
+      // For hop 0: should not happen (we skip queuing at source)
+      // For hop 1: waits at Router before transmitting to Destination
+      const nodeX = this.nodeScale(startNode.name);
+      const y = this.timeScale(accumulatedTime);
+      
+      this.drawPacketIndicator(nodeX, y, packet.color, 'queuing');
+    }
+  }
+  
+  /**
+   * Draw a packet segment (line)
+   */
+  drawPacketSegment(x1, y1, x2, y2, color, id) {
+    const line = this.createSVGElement('line', {
+      x1: x1,
+      y1: y1,
+      x2: x2,
+      y2: y2,
+      stroke: color,
+      'stroke-width': 2,
+      opacity: 0.7,
+      'data-packet-id': id
+    });
+    this.packetGroup.appendChild(line);
+  }
+  
+  /**
+   * Draw a packet indicator (circle)
+   */
+  drawPacketIndicator(x, y, color, type) {
+    // Create a larger, more visible circle
+    const circle = this.createSVGElement('circle', {
+      cx: x,
+      cy: y,
+      r: 10,  // Larger radius for visibility
+      fill: color || '#FF0000',  // Default to red if no color
+      stroke: '#000000',  // Black stroke for visibility
+      'stroke-width': 2,
+      opacity: 1.0
+    });
+    this.packetGroup.appendChild(circle);
+    
+    console.log(`Drew packet at (${x}, ${y}) with color ${color}`);
+    
+    // Add pulsing animation for queuing and waiting packets
+    if (type === 'queuing' || type === 'waiting') {
+      circle.style.animation = 'pulse 1s infinite';
+    }
+  }
+  
+  /**
+   * Draw queue indicator at a node
+   */
+  drawQueueIndicator(hopIndex, queueState) {
+    if (hopIndex >= this.scenario.nodes.length - 1) return;
+    
+    const node = this.scenario.nodes[hopIndex];
+    const nodeX = this.nodeScale(node.name);
+    const y = this.timeScale(this.currentTime);
+    
+    // Draw queue length indicator
+    if (queueState.queueLength > 0) {
+      const text = this.createSVGElement('text', {
+        x: nodeX + 15,
+        y: y,
+        'font-size': '10px',
+        fill: '#9b59b6',
+        'font-weight': 'bold'
+      });
+      text.textContent = `Q:${queueState.queueLength}`;
+      this.packetGroup.appendChild(text);
+    }
+  }
+  
+  /**
+   * Calculate accumulated time up to a certain phase
+   */
+  getAccumulatedTime(hopIndex, targetPhase) {
+    let time = 0;
+    const phases = ['transmission', 'propagation', 'processing', 'queuing'];
+    const targetIndex = phases.indexOf(targetPhase);
+    
+    // Add time from previous hops
+    for (let i = 0; i < hopIndex; i++) {
+      const hop = this.scenario.hops[i];
+      time += this.getHopTotalTime(hop);
+    }
+    
+    // Add time from current hop up to target phase
+    const hop = this.scenario.hops[hopIndex];
+    const packetSizeBits = this.scenario.packetSize * 8;
+    
+    for (let i = 0; i < targetIndex; i++) {
+      if (phases[i] === 'transmission' && hop.bandwidth) {
+        time += (packetSizeBits / hop.bandwidth) * 1000;
+      } else if (phases[i] === 'propagation' && hop.distance && hop.propagationSpeed) {
+        time += (hop.distance / hop.propagationSpeed) * 1000;
+      } else if (phases[i] === 'processing' && hop.processingDelay) {
+        time += hop.processingDelay;
+      } else if (phases[i] === 'queuing' && hop.queuingDelay) {
+        time += hop.queuingDelay;
+      }
+    }
+    
+    return time;
+  }
+  
+  /**
+   * Get total time for a hop
+   */
+  getHopTotalTime(hop) {
+    let time = 0;
+    const packetSizeBits = this.scenario.packetSize * 8;
+    
+    if (hop.bandwidth) {
+      time += (packetSizeBits / hop.bandwidth) * 1000;
+    }
+    if (hop.distance && hop.propagationSpeed) {
+      time += (hop.distance / hop.propagationSpeed) * 1000;
+    }
+    if (hop.processingDelay) {
+      time += hop.processingDelay;
+    }
+    if (hop.queuingDelay) {
+      time += hop.queuingDelay;
+    }
+    
+    return time;
   }
   
   /**

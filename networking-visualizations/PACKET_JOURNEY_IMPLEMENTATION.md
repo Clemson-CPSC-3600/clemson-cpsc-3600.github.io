@@ -93,19 +93,13 @@ demos/packet-journey/
    - Link thickness based on bandwidth
    - Color coding for latency levels
 
-2. **Latency Breakdown Charts**
-   - Per-hop stacked bar chart
-   - Overall pie chart
-   - Cumulative line graph
-   - Component comparison bars
-
-3. **Visual Indicators**
+2. **Visual Indicators**
    - Color gradients (green → red)
    - Animated number transitions
    - Hover tooltips with details
    - Warning icons for bottlenecks
 
-4. **Responsive Layout**
+3. **Responsive Layout**
    - Mobile-friendly design
    - Collapsible panels
    - Touch-friendly controls

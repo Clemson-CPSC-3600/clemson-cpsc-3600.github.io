@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Utility Module Tests</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #2d2d30;
+        }
+        .test-title {
+            color: #569cd6;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .test-case {
+            margin: 5px 0;
+            padding: 5px;
+        }
+        .pass {
+            color: #4ec9b0;
+        }
+        .fail {
+            color: #f48771;
+        }
+        .error {
+            color: #f48771;
+            background: #3e1212;
+            padding: 5px;
+            margin: 5px 0;
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #569cd6;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        #svg-test {
+            border: 1px solid #666;
+            background: white;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Utility Module Test Suite</h1>
+    <div id="test-results"></div>
+    <svg id="svg-test" width="400" height="200"></svg>
+    
+    <script type="module">
+        import { NetworkFormatter } from './js/utils/NetworkFormatter.js';
+        import { DelayCalculator } from './js/utils/DelayCalculator.js';
+        import { SVGBuilder } from './js/utils/SVGBuilder.js';
+        import { COLORS, SIZES, THRESHOLDS, DEFAULTS } from './js/constants.js';
+        
+        // Test framework
+        class TestRunner {
+            constructor() {
+                this.tests = [];
+                this.passed = 0;
+                this.failed = 0;
+                this.output = document.getElementById('test-results');
+            }
+            
+            test(name, fn) {
+                this.tests.push({ name, fn });
+            }
+            
+            assert(condition, message) {
+                if (!condition) {
+                    throw new Error(message || 'Assertion failed');
+                }
+            }
+            
+            assertEqual(actual, expected, message) {
+                if (actual !== expected) {
+                    throw new Error(message || `Expected ${expected}, got ${actual}`);
+                }
+            }
+            
+            assertClose(actual, expected, tolerance = 0.001, message) {
+                if (Math.abs(actual - expected) > tolerance) {
+                    throw new Error(message || `Expected ${expected}±${tolerance}, got ${actual}`);
+                }
+            }
+            
+            async run() {
+                for (const test of this.tests) {
+                    const section = document.createElement('div');
+                    section.className = 'test-section';
+                    
+                    const title = document.createElement('div');
+                    title.className = 'test-title';
+                    title.textContent = test.name;
+                    section.appendChild(title);
+                    
+                    try {
+                        await test.fn.call(this);
+                        const result = document.createElement('div');
+                        result.className = 'test-case pass';
+                        result.textContent = '✓ PASSED';
+                        section.appendChild(result);
+                        this.passed++;
+                    } catch (error) {
+                        const result = document.createElement('div');
+                        result.className = 'test-case fail';
+                        result.textContent = '✗ FAILED';
+                        section.appendChild(result);
+                        
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'error';
+                        errorDiv.textContent = error.message;
+                        section.appendChild(errorDiv);
+                        this.failed++;
+                    }
+                    
+                    this.output.appendChild(section);
+                }
+                
+                this.showSummary();
+            }
+            
+            showSummary() {
+                const summary = document.createElement('div');
+                summary.className = 'summary';
+                const passRate = this.tests.length > 0 ? 
+                    ((this.passed / this.tests.length) * 100).toFixed(1) : 0;
+                summary.innerHTML = `
+                    <h2>Test Summary</h2>
+                    <div>Total Tests: ${this.tests.length}</div>
+                    <div class="pass">Passed: ${this.passed}</div>
+                    <div class="fail">Failed: ${this.failed}</div>
+                    <div>Pass Rate: ${passRate}%</div>
+                `;
+                this.output.appendChild(summary);
+            }
+        }
+        
+        // Create test runner
+        const runner = new TestRunner();
+        
+        // NetworkFormatter Tests
+        runner.test('NetworkFormatter.bandwidth()', function() {
+            this.assertEqual(NetworkFormatter.bandwidth(1e9), '1Gbps');
+            this.assertEqual(NetworkFormatter.bandwidth(1.5e9), '1.5Gbps');
+            this.assertEqual(NetworkFormatter.bandwidth(100e6), '100Mbps');
+            this.assertEqual(NetworkFormatter.bandwidth(1e6), '1Mbps');
+            this.assertEqual(NetworkFormatter.bandwidth(512e3), '512Kbps');
+            this.assertEqual(NetworkFormatter.bandwidth(1e3), '1Kbps');
+            this.assertEqual(NetworkFormatter.bandwidth(512), '512bps');
+            this.assertEqual(NetworkFormatter.bandwidth(0), '0bps');
+        });
+        
+        runner.test('NetworkFormatter.distance()', function() {
+            this.assertEqual(NetworkFormatter.distance(5500e3), '5.5Mm');
+            this.assertEqual(NetworkFormatter.distance(1e6), '1Mm');
+            this.assertEqual(NetworkFormatter.distance(1500e3), '1.5Mm');
+            this.assertEqual(NetworkFormatter.distance(100e3), '100km');
+            this.assertEqual(NetworkFormatter.distance(1e3), '1km');
+            this.assertEqual(NetworkFormatter.distance(500), '500m');
+            this.assertEqual(NetworkFormatter.distance(50), '50m');
+            this.assertEqual(NetworkFormatter.distance(0), '0m');
+        });
+        
+        runner.test('NetworkFormatter.time()', function() {
+            this.assertEqual(NetworkFormatter.time(0.0005), '0.5μs');
+            this.assertEqual(NetworkFormatter.time(0.001), '0.001ms');
+            this.assertEqual(NetworkFormatter.time(0.05), '0.050ms');
+            this.assertEqual(NetworkFormatter.time(0.1), '0.10ms');
+            this.assertEqual(NetworkFormatter.time(0.5), '0.50ms');
+            this.assertEqual(NetworkFormatter.time(1), '1.0ms');
+            this.assertEqual(NetworkFormatter.time(5.5), '5.5ms');
+            this.assertEqual(NetworkFormatter.time(10), '10ms');
+            this.assertEqual(NetworkFormatter.time(100), '100ms');
+            
+            // Test with context
+            this.assertEqual(NetworkFormatter.time(0.123, 0.5), '0.123ms');
+            this.assertEqual(NetworkFormatter.time(5.5, 10), '5.50ms');
+            this.assertEqual(NetworkFormatter.time(50.5, 100), '50.5ms');
+            this.assertEqual(NetworkFormatter.time(150, 200), '150ms');
+        });
+        
+        runner.test('NetworkFormatter.packetLocation()', function() {
+            this.assertEqual(NetworkFormatter.packetLocation('A', 'B', 0), 'A');
+            this.assertEqual(NetworkFormatter.packetLocation('A', 'B', 0.25), 'A → B (25%)');
+            this.assertEqual(NetworkFormatter.packetLocation('A', 'B', 0.5), 'A → B (50%)');
+            this.assertEqual(NetworkFormatter.packetLocation('A', 'B', 0.75), 'A → B (75%)');
+            this.assertEqual(NetworkFormatter.packetLocation('A', 'B', 1), 'B');
+        });
+        
+        runner.test('DelayCalculator.calculateHopDelays()', function() {
+            const hop = {
+                bandwidth: 100e6,  // 100 Mbps
+                distance: 1000,    // 1 km
+                propagationSpeed: 2e8,  // 2×10^8 m/s
+                processingDelay: 0.5,
+                queuingDelay: 0.2
+            };
+            
+            const delays = DelayCalculator.calculateHopDelays(hop, 1500);
+            
+            // Transmission: (1500 * 8) / 100e6 * 1000 = 0.12 ms
+            this.assertClose(delays.transmission, 0.12);
+            
+            // Propagation: 1000 / 2e8 * 1000 = 0.005 ms
+            this.assertClose(delays.propagation, 0.005);
+            
+            // Processing and queuing
+            this.assertEqual(delays.processing, 0.5);
+            this.assertEqual(delays.queuing, 0.2);
+            
+            // Total
+            this.assertClose(delays.total, 0.825);
+        });
+        
+        runner.test('DelayCalculator.calculateScenarioTotalDelay()', function() {
+            const scenario = {
+                packetSize: 1500,
+                hops: [
+                    {
+                        bandwidth: 1e9,  // 1 Gbps
+                        distance: 100,
+                        propagationSpeed: 2e8,
+                        processingDelay: 0.1,
+                        queuingDelay: 0
+                    },
+                    {
+                        bandwidth: 100e6,  // 100 Mbps
+                        distance: 1000,
+                        propagationSpeed: 2e8,
+                        processingDelay: 0.5,
+                        queuingDelay: 0.2
+                    }
+                ]
+            };
+            
+            const totals = DelayCalculator.calculateScenarioTotalDelay(scenario);
+            
+            // Hop 1: transmission = 0.012ms, propagation = 0.0005ms
+            // Hop 2: transmission = 0.12ms, propagation = 0.005ms
+            this.assertClose(totals.transmission, 0.132);
+            this.assertClose(totals.propagation, 0.0055);
+            this.assertEqual(totals.processing, 0.6);
+            this.assertEqual(totals.queuing, 0.2);
+            
+            // Check dominant component
+            this.assertEqual(totals.dominant, 'processing');
+        });
+        
+        runner.test('DelayCalculator.calculateSegments()', function() {
+            const scenario = {
+                packetSize: 1500,
+                nodes: [
+                    { name: 'Source' },
+                    { name: 'Router' },
+                    { name: 'Destination' }
+                ],
+                hops: [
+                    {
+                        bandwidth: 100e6,
+                        distance: 1000,
+                        propagationSpeed: 2e8,
+                        processingDelay: 0.5,
+                        queuingDelay: 0.2
+                    },
+                    {
+                        bandwidth: 100e6,
+                        distance: 1000,
+                        propagationSpeed: 2e8,
+                        processingDelay: 0.5,
+                        queuingDelay: 0.1
+                    }
+                ]
+            };
+            
+            const segments = DelayCalculator.calculateSegments(scenario);
+            
+            // Should have segments for transmission-propagation and processing
+            this.assert(segments.length > 0);
+            
+            // Check first segment
+            const firstSegment = segments[0];
+            this.assertEqual(firstSegment.type, 'transmission-propagation');
+            this.assertEqual(firstSegment.startNode, 'Source');
+            this.assertEqual(firstSegment.endNode, 'Router');
+            
+            // Verify timing
+            this.assertClose(firstSegment.transmissionTime, 0.12);
+            this.assertClose(firstSegment.propagationTime, 0.005);
+        });
+        
+        runner.test('SVGBuilder basic elements', function() {
+            const svg = document.getElementById('svg-test');
+            svg.innerHTML = '';  // Clear previous tests
+            
+            const builder = new SVGBuilder(svg);
+            
+            // Test line creation
+            const line = builder.line(10, 10, 100, 50, {
+                stroke: 'blue',
+                'stroke-width': 2
+            });
+            this.assertEqual(line.getAttribute('x1'), '10');
+            this.assertEqual(line.getAttribute('stroke'), 'blue');
+            
+            // Test circle creation
+            const circle = builder.circle(50, 50, 20, {
+                fill: 'red'
+            });
+            this.assertEqual(circle.getAttribute('r'), '20');
+            this.assertEqual(circle.getAttribute('fill'), 'red');
+            
+            // Test text creation
+            const text = builder.text(100, 100, 'Test', {
+                'font-size': '14px'
+            });
+            this.assertEqual(text.textContent, 'Test');
+            this.assertEqual(text.getAttribute('font-size'), '14px');
+            
+            // Test group creation
+            const group = builder.group({ class: 'test-group' });
+            this.assertEqual(group.getAttribute('class'), 'test-group');
+            
+            // Verify elements were added to SVG
+            this.assert(svg.children.length >= 4);
+        });
+        
+        runner.test('SVGBuilder transform helper', function() {
+            const transform1 = SVGBuilder.transform({
+                translate: [10, 20]
+            });
+            this.assertEqual(transform1, 'translate(10, 20)');
+            
+            const transform2 = SVGBuilder.transform({
+                translate: [5, 10],
+                rotate: 45,
+                scale: 2
+            });
+            this.assertEqual(transform2, 'translate(5, 10) rotate(45) scale(2)');
+            
+            const transform3 = SVGBuilder.transform({
+                rotate: [45, 100, 100]
+            });
+            this.assertEqual(transform3, 'rotate(45, 100, 100)');
+        });
+        
+        runner.test('Constants module structure', function() {
+            // Test that constants are properly defined
+            this.assert(COLORS.DELAYS.TRANSMISSION === '#e74c3c');
+            this.assert(COLORS.PACKET.DEFAULT === '#2ecc71');
+            this.assert(SIZES.PACKET_RADIUS === 10);
+            this.assert(THRESHOLDS.MAX_PACKETS === 20);
+            this.assert(DEFAULTS.PACKET_SIZE === 1500);
+            
+            // Test array constants
+            this.assert(Array.isArray(COLORS.PACKET.MULTI));
+            this.assert(COLORS.PACKET.MULTI.length === 8);
+        });
+        
+        runner.test('DelayCalculator.isSignificantDelay()', function() {
+            this.assert(DelayCalculator.isSignificantDelay(0.002, 'transmission') === true);
+            this.assert(DelayCalculator.isSignificantDelay(0.0005, 'transmission') === false);
+            
+            this.assert(DelayCalculator.isSignificantDelay(0.2, 'propagation') === true);
+            this.assert(DelayCalculator.isSignificantDelay(0.05, 'propagation') === false);
+            
+            this.assert(DelayCalculator.isSignificantDelay(0.15, 'processing') === true);
+            this.assert(DelayCalculator.isSignificantDelay(0.05, 'processing') === false);
+        });
+        
+        runner.test('NetworkFormatter.getTimeInterval()', function() {
+            this.assertEqual(NetworkFormatter.getTimeInterval(0.4), 0.05);
+            this.assertEqual(NetworkFormatter.getTimeInterval(0.8), 0.1);
+            this.assertEqual(NetworkFormatter.getTimeInterval(1.5), 0.2);
+            this.assertEqual(NetworkFormatter.getTimeInterval(4), 0.5);
+            this.assertEqual(NetworkFormatter.getTimeInterval(10), 1);
+            this.assertEqual(NetworkFormatter.getTimeInterval(80), 10);
+            this.assertEqual(NetworkFormatter.getTimeInterval(400), 50);
+        });
+        
+        // Run all tests
+        runner.run();
+    </script>
+</body>
+</html>

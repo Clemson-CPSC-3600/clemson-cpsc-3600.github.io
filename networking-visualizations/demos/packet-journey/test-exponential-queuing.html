@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exponential Queuing Model Test</title>
+  <link rel="stylesheet" href="../../shared/styles/base.css">
+  <link rel="stylesheet" href="styles/journey.css">
+  <style>
+    .test-info {
+      background: #f0f8ff;
+      border: 2px solid #0066cc;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    .formula {
+      background: #333;
+      color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      margin: 20px 0;
+      text-align: center;
+      font-size: 18px;
+    }
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .util-card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      text-align: center;
+    }
+    .util-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #0066cc;
+    }
+    .delay-value {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+    .low { color: #2ecc71; }
+    .medium { color: #f39c12; }
+    .high { color: #e67e22; }
+    .extreme { color: #e74c3c; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="page-header">
+      <h1>📈 Exponential Queuing Model Verification</h1>
+      <p>Testing the (1/(1-u)³)-1 formula in the packet journey demo</p>
+    </header>
+
+    <div class="formula">
+      Queuing Delay = [(1 / (1 - utilization)³) - 1] × Transmission Time
+    </div>
+
+    <div class="test-info">
+      <h3>How This Model Works:</h3>
+      <ul>
+        <li>Queuing delay grows exponentially as utilization increases</li>
+        <li>Low utilization (< 50%) = minimal queuing</li>
+        <li>Medium utilization (50-70%) = noticeable queuing</li>
+        <li>High utilization (70-85%) = significant queuing</li>
+        <li>Extreme utilization (> 85%) = severe queuing</li>
+      </ul>
+    </div>
+
+    <h2>Test Different Utilization Levels:</h2>
+    <div class="test-grid" id="test-grid"></div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Live Visualization</h2>
+      </div>
+      <div class="card-body">
+        <div class="visualization-container">
+          <canvas id="journey-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { DelayCalculator } from '../../shared/utils/DelayCalculator.js';
+    import { VisualizationOrchestrator } from './js/components/VisualizationOrchestrator.js';
+    
+    // Test the formula at different utilization levels
+    const testUtilizations = [0.1, 0.3, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95];
+    const gridDiv = document.getElementById('test-grid');
+    
+    testUtilizations.forEach(util => {
+      // Create test hop
+      const hop = {
+        node: `Router (${(util * 100).toFixed(0)}% util)`,
+        bandwidth: 1000000000, // 1 Gbps
+        utilization: util,
+        distance: 1000,
+        processingDelay: 0.001
+      };
+      
+      // Calculate delays
+      const delays = DelayCalculator.calculateHopDelays(hop, 1500);
+      
+      // Determine severity class
+      let severityClass = 'low';
+      if (util >= 0.85) severityClass = 'extreme';
+      else if (util >= 0.7) severityClass = 'high';
+      else if (util >= 0.5) severityClass = 'medium';
+      
+      // Create card
+      const card = document.createElement('div');
+      card.className = 'util-card';
+      card.innerHTML = `
+        <div class="util-value">${(util * 100).toFixed(0)}%</div>
+        <div class="delay-value ${severityClass}">
+          Queuing: ${delays.queuing.toFixed(3)}ms
+        </div>
+        <div style="font-size: 12px; color: #666;">
+          Multiplier: ${((1 / Math.pow(1 - util, 3)) - 1).toFixed(1)}×
+        </div>
+        <div style="font-size: 11px; color: #999; margin-top: 5px;">
+          Trans: ${delays.transmission.toFixed(3)}ms<br>
+          Total: ${delays.total.toFixed(3)}ms
+        </div>
+      `;
+      gridDiv.appendChild(card);
+    });
+    
+    // Initialize visualization with a test scenario
+    const orchestrator = new VisualizationOrchestrator('journey-canvas');
+    
+    // Create a test path with varying utilization
+    const testPath = {
+      id: 'queuing-test',
+      name: 'Queuing Delay Test',
+      packetSize: 1500,
+      hops: [
+        {
+          node: 'Source',
+          nodeType: 'client',
+          bandwidth: 1000000000,
+          distance: 100,
+          utilization: 0.3, // Low
+          processingDelay: 0.001
+        },
+        {
+          node: 'Router 1',
+          nodeType: 'router',
+          bandwidth: 1000000000,
+          distance: 1000,
+          utilization: 0.6, // Medium
+          processingDelay: 0.001
+        },
+        {
+          node: 'Router 2',
+          nodeType: 'router',
+          bandwidth: 100000000,
+          distance: 5000,
+          utilization: 0.8, // High
+          processingDelay: 0.002
+        },
+        {
+          node: 'Congested',
+          nodeType: 'router',
+          bandwidth: 100000000,
+          distance: 1000,
+          utilization: 0.9, // Extreme
+          processingDelay: 0.002
+        },
+        {
+          node: 'Destination',
+          nodeType: 'server',
+          bandwidth: 1000000000,
+          distance: 0,
+          utilization: 0.4,
+          processingDelay: 0.01
+        }
+      ]
+    };
+    
+    // Render the test path
+    orchestrator.update(testPath);
+    
+    // Log the calculations
+    console.log('🧪 Exponential Queuing Model Test');
+    console.log('Formula: (1 / (1 - u)³) - 1');
+    console.log('');
+    testPath.hops.forEach((hop, i) => {
+      if (hop.utilization) {
+        const delays = DelayCalculator.calculateHopDelays(hop, 1500);
+        const multiplier = (1 / Math.pow(1 - hop.utilization, 3)) - 1;
+        console.log(`${hop.node}:`);
+        console.log(`  Utilization: ${(hop.utilization * 100).toFixed(0)}%`);
+        console.log(`  Multiplier: ${multiplier.toFixed(2)}×`);
+        console.log(`  Queuing Delay: ${delays.queuing.toFixed(3)}ms`);
+        console.log(`  Total Delay: ${delays.total.toFixed(3)}ms`);
+        console.log('');
+      }
+    });
+  </script>
+</body>
+</html>

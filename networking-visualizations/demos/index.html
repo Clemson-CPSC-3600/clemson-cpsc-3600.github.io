@@ -4,19 +4,204 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interactive Demos - Networking Visualizations</title>
-  <style>
-    /* Inline essential styles for build to work */
-    body { margin: 0; padding: 0; font-family: sans-serif; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-  </style>
+  <meta name="description" content="Explore interactive networking demonstrations including packet journey, latency calculator, and ladder diagrams">
+  <link rel="stylesheet" href="../shared/styles/main.css">
+  <link rel="stylesheet" href="./styles/demos.css">
 </head>
 <body>
-  <main>
-    <div class="container">
+  <nav id="site-navigation"></nav>
+  
+  <main class="demos-container">
+    <header class="demos-header">
       <h1>Interactive Networking Demos</h1>
-      <p>Coming soon: Interactive demonstrations of networking concepts.</p>
+      <p class="subtitle">Explore networking concepts through interactive visualizations</p>
+    </header>
+
+    <div class="demos-grid">
+      <!-- Packet Journey Demo -->
+      <article class="demo-card featured">
+        <div class="demo-card-header">
+          <span class="demo-badge">Featured</span>
+          <h2>Packet Journey</h2>
+        </div>
+        <div class="demo-card-body">
+          <p class="demo-description">
+            Watch packets travel through a network in real-time. Visualize routing decisions, 
+            network congestion, and packet loss in an interactive network topology.
+          </p>
+          <div class="demo-features">
+            <span class="feature-tag">Routing</span>
+            <span class="feature-tag">Topology</span>
+            <span class="feature-tag">Animation</span>
+            <span class="feature-tag">Interactive</span>
+          </div>
+        </div>
+        <div class="demo-card-footer">
+          <div class="demo-meta">
+            <span class="difficulty easy">Beginner</span>
+            <span class="duration">5-10 min</span>
+          </div>
+          <a href="./packet-journey/" class="btn btn-primary">Launch Demo →</a>
+        </div>
+      </article>
+
+      <!-- Ladder Diagram Demo -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <span class="demo-badge new">New</span>
+          <h2>Ladder Diagram</h2>
+        </div>
+        <div class="demo-card-body">
+          <p class="demo-description">
+            Visualize packet transmission timing with detailed ladder diagrams showing 
+            transmission, propagation, processing, and queuing delays across network hops.
+          </p>
+          <div class="demo-features">
+            <span class="feature-tag">Timing</span>
+            <span class="feature-tag">Delays</span>
+            <span class="feature-tag">Multi-hop</span>
+            <span class="feature-tag">Analysis</span>
+          </div>
+        </div>
+        <div class="demo-card-footer">
+          <div class="demo-meta">
+            <span class="difficulty intermediate">Intermediate</span>
+            <span class="duration">10-15 min</span>
+          </div>
+          <a href="./ladder-diagram/" class="btn btn-primary">Launch Demo →</a>
+        </div>
+      </article>
+
+      <!-- Latency Practice Demo -->
+      <article class="demo-card">
+        <div class="demo-card-header">
+          <h2>Latency Calculator</h2>
+        </div>
+        <div class="demo-card-body">
+          <p class="demo-description">
+            Practice calculating network latency with interactive exercises. Understand how 
+            distance, bandwidth, packet size, and processing affect total latency.
+          </p>
+          <div class="demo-features">
+            <span class="feature-tag">Calculations</span>
+            <span class="feature-tag">Practice</span>
+            <span class="feature-tag">Feedback</span>
+            <span class="feature-tag">Learning</span>
+          </div>
+        </div>
+        <div class="demo-card-footer">
+          <div class="demo-meta">
+            <span class="difficulty easy">Beginner</span>
+            <span class="duration">5-10 min</span>
+          </div>
+          <a href="./latency-practice/" class="btn btn-primary">Launch Demo →</a>
+        </div>
+      </article>
+
+      <!-- Coming Soon Cards -->
+      <article class="demo-card coming-soon">
+        <div class="demo-card-header">
+          <span class="demo-badge coming">Coming Soon</span>
+          <h2>TCP Congestion Control</h2>
+        </div>
+        <div class="demo-card-body">
+          <p class="demo-description">
+            Explore TCP congestion control algorithms including slow start, congestion avoidance, 
+            and fast recovery with real-time visualizations.
+          </p>
+          <div class="demo-features">
+            <span class="feature-tag">TCP</span>
+            <span class="feature-tag">Algorithms</span>
+            <span class="feature-tag">Congestion</span>
+          </div>
+        </div>
+        <div class="demo-card-footer">
+          <div class="demo-meta">
+            <span class="difficulty advanced">Advanced</span>
+            <span class="duration">15-20 min</span>
+          </div>
+          <button class="btn btn-disabled" disabled>Coming Soon</button>
+        </div>
+      </article>
+
+      <article class="demo-card coming-soon">
+        <div class="demo-card-header">
+          <span class="demo-badge coming">Coming Soon</span>
+          <h2>DNS Resolution</h2>
+        </div>
+        <div class="demo-card-body">
+          <p class="demo-description">
+            Step through the DNS resolution process from recursive queries to authoritative 
+            responses, including caching and TTL effects.
+          </p>
+          <div class="demo-features">
+            <span class="feature-tag">DNS</span>
+            <span class="feature-tag">Resolution</span>
+            <span class="feature-tag">Caching</span>
+          </div>
+        </div>
+        <div class="demo-card-footer">
+          <div class="demo-meta">
+            <span class="difficulty intermediate">Intermediate</span>
+            <span class="duration">10-15 min</span>
+          </div>
+          <button class="btn btn-disabled" disabled>Coming Soon</button>
+        </div>
+      </article>
+
+      <article class="demo-card coming-soon">
+        <div class="demo-card-header">
+          <span class="demo-badge coming">Coming Soon</span>
+          <h2>Routing Protocols</h2>
+        </div>
+        <div class="demo-card-body">
+          <p class="demo-description">
+            Compare distance vector and link state routing protocols. Watch routing tables 
+            converge and see how loops are prevented.
+          </p>
+          <div class="demo-features">
+            <span class="feature-tag">RIP</span>
+            <span class="feature-tag">OSPF</span>
+            <span class="feature-tag">BGP</span>
+          </div>
+        </div>
+        <div class="demo-card-footer">
+          <div class="demo-meta">
+            <span class="difficulty advanced">Advanced</span>
+            <span class="duration">20-30 min</span>
+          </div>
+          <button class="btn btn-disabled" disabled>Coming Soon</button>
+        </div>
+      </article>
     </div>
+
+    <section class="demos-info">
+      <h2>About These Demos</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>🎯 Interactive Learning</h3>
+          <p>Each demo is designed to be hands-on and interactive, allowing you to experiment 
+             with parameters and see immediate results.</p>
+        </div>
+        <div class="info-card">
+          <h3>📚 Educational Focus</h3>
+          <p>Built for computer science students and networking professionals to understand 
+             complex concepts through visualization.</p>
+        </div>
+        <div class="info-card">
+          <h3>🚀 Progressive Difficulty</h3>
+          <p>Start with beginner-friendly demos and work your way up to advanced topics 
+             as you build your understanding.</p>
+        </div>
+      </div>
+    </section>
   </main>
-  <script type="module" src="./main.js"></script>
+
+  <footer class="site-footer">
+    <p>© 2024 Networking Visualizations | Built for CPSC 3600</p>
+  </footer>
+
+  <script type="module" src="../shared/js/navigation.js"></script>
+  <script type="module" src="./demos.js"></script>
 </body>
 </html>

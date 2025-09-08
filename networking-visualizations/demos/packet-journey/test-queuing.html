@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Queuing Delay Test</title>
+  <link rel="stylesheet" href="../../shared/styles/base.css">
+  <style>
+    .test-case {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f5f5f5;
+      border-radius: 5px;
+    }
+    .result {
+      font-family: monospace;
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      margin: 10px 0;
+    }
+    .formula {
+      background: #e8f4f8;
+      padding: 10px;
+      border-left: 4px solid #0066cc;
+      margin: 15px 0;
+      font-family: 'Courier New', monospace;
+    }
+    .highlight { 
+      background: #ffeb3b; 
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="page-header">
+      <h1>🧪 Dynamic Queuing Delay Calculation</h1>
+      <p>Testing M/M/1 queue model for dynamic queuing delay based on utilization</p>
+    </header>
+
+    <div class="formula">
+      <strong>M/M/1 Queue Formula:</strong><br>
+      Queuing Delay = (ρ / (1 - ρ)) × Service Time<br>
+      Where: ρ = utilization (0 to 1)<br>
+      Service Time = packet_size / bandwidth
+    </div>
+
+    <div id="test-results"></div>
+  </main>
+
+  <script type="module">
+    import { DelayCalculator } from '../../shared/utils/DelayCalculator.js';
+    
+    const resultsDiv = document.getElementById('test-results');
+    
+    // Test cases with different utilization levels
+    const testCases = [
+      {
+        name: 'Low Utilization (30%)',
+        hop: {
+          node: 'Router A',
+          bandwidth: 1000000000, // 1 Gbps
+          utilization: 0.3,
+          distance: 100
+        },
+        expected: 'Low queuing delay'
+      },
+      {
+        name: 'Medium Utilization (60%)',
+        hop: {
+          node: 'Router B',
+          bandwidth: 1000000000, // 1 Gbps
+          utilization: 0.6,
+          distance: 100
+        },
+        expected: 'Moderate queuing delay'
+      },
+      {
+        name: 'High Utilization (80%)',
+        hop: {
+          node: 'Router C',
+          bandwidth: 1000000000, // 1 Gbps
+          utilization: 0.8,
+          distance: 100
+        },
+        expected: 'High queuing delay'
+      },
+      {
+        name: 'Very High Utilization (95%)',
+        hop: {
+          node: 'Router D',
+          bandwidth: 100000000, // 100 Mbps
+          utilization: 0.95,
+          distance: 100
+        },
+        expected: 'Very high queuing delay'
+      },
+      {
+        name: 'Explicit Queuing (Congested scenario)',
+        hop: {
+          node: 'Congested Router',
+          bandwidth: 100000000, // 100 Mbps
+          utilization: 0.95,
+          queuingDelay: 100, // Explicit 100ms
+          distance: 100
+        },
+        expected: 'Uses explicit value (100ms)'
+      }
+    ];
+    
+    // Run tests
+    testCases.forEach(testCase => {
+      const delays = DelayCalculator.calculateHopDelays(testCase.hop, 1500);
+      const serviceTime = (1500 * 8 / testCase.hop.bandwidth) * 1000;
+      
+      const testDiv = document.createElement('div');
+      testDiv.className = 'test-case';
+      
+      let expectedQueuing = 0;
+      if (testCase.hop.queuingDelay) {
+        expectedQueuing = testCase.hop.queuingDelay;
+      } else if (testCase.hop.utilization) {
+        const util = Math.min(testCase.hop.utilization, 0.99);
+        expectedQueuing = (util / (1 - util)) * serviceTime;
+        expectedQueuing = Math.min(expectedQueuing, 500);
+      }
+      
+      testDiv.innerHTML = `
+        <h3>${testCase.name}</h3>
+        <div class="result">
+          <strong>Node:</strong> ${testCase.hop.node}<br>
+          <strong>Bandwidth:</strong> ${(testCase.hop.bandwidth / 1e6).toFixed(0)} Mbps<br>
+          <strong>Utilization:</strong> ${(testCase.hop.utilization * 100).toFixed(0)}%<br>
+          ${testCase.hop.queuingDelay ? `<strong>Explicit Queuing:</strong> ${testCase.hop.queuingDelay}ms<br>` : ''}
+          <br>
+          <strong>Service Time:</strong> ${serviceTime.toFixed(6)}ms (time to transmit 1500 bytes)<br>
+          <strong>Calculated Queuing Delay:</strong> <span class="highlight">${delays.queuing.toFixed(3)}ms</span><br>
+          <strong>Expected:</strong> ${expectedQueuing.toFixed(3)}ms<br>
+          <br>
+          <strong>All Delays:</strong><br>
+          - Transmission: ${delays.transmission.toFixed(3)}ms<br>
+          - Propagation: ${delays.propagation.toFixed(3)}ms<br>
+          - Processing: ${delays.processing.toFixed(3)}ms<br>
+          - Queuing: <span class="highlight">${delays.queuing.toFixed(3)}ms</span><br>
+          - <strong>Total: ${delays.total.toFixed(3)}ms</strong>
+        </div>
+      `;
+      resultsDiv.appendChild(testDiv);
+    });
+    
+    // Add explanation
+    const explanationDiv = document.createElement('div');
+    explanationDiv.className = 'test-case';
+    explanationDiv.style.background = '#e8f4f8';
+    explanationDiv.innerHTML = `
+      <h3>📊 How It Works</h3>
+      <div class="result">
+        <p><strong>Dynamic Calculation:</strong></p>
+        <ul>
+          <li>When only <code>utilization</code> is provided, queuing delay is calculated using M/M/1 model</li>
+          <li>Delay increases exponentially as utilization approaches 100%</li>
+          <li>At 50% utilization: queuing ≈ 1× service time</li>
+          <li>At 80% utilization: queuing ≈ 4× service time</li>
+          <li>At 95% utilization: queuing ≈ 19× service time</li>
+        </ul>
+        
+        <p><strong>Override Option:</strong></p>
+        <ul>
+          <li>If <code>queuingDelay</code> is explicitly set, it overrides the calculation</li>
+          <li>Useful for modeling specific congestion scenarios</li>
+        </ul>
+        
+        <p><strong>Safety:</strong></p>
+        <ul>
+          <li>Utilization capped at 99% to avoid infinity</li>
+          <li>Maximum queuing delay capped at 500ms for realism</li>
+        </ul>
+      </div>
+    `;
+    resultsDiv.appendChild(explanationDiv);
+  </script>
+</body>
+</html>
