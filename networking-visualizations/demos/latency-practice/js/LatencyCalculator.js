@@ -58,26 +58,27 @@ export class LatencyCalculator {
   }
   
   /**
-   * Calculate queuing delay using M/M/1 queue model
-   * @param {number} arrivalRate - Packets per second arriving
-   * @param {number} serviceRate - Packets per second that can be processed
-   * @param {number} currentQueueDepth - Current number of packets in queue
+   * Calculate queuing delay using cubic utilization model
+   * @param {number} utilization - Link utilization (0-1)
    * @returns {number} Delay in seconds
    */
-  queuingDelay(arrivalRate, serviceRate, currentQueueDepth = 0) {
-    if (serviceRate <= arrivalRate) {
-      // Queue is unstable, return a large delay
-      return 1.0; // 1 second as max queuing delay
+  queuingDelay(utilization) {
+    // If queue is unstable (utilization >= 95%), return high delay
+    if (utilization >= 0.95) {
+      return 0.1; // 100ms max queuing delay (in seconds)
     }
     
-    // M/M/1 average waiting time
-    const utilization = arrivalRate / serviceRate;
-    const avgWaitTime = utilization / (serviceRate * (1 - utilization));
+    // If very low utilization, minimal queuing
+    if (utilization < 0.05) {
+      return 0.0001; // 0.1ms minimal queuing delay (in seconds)
+    }
     
-    // Add current queue depth impact
-    const currentDelay = currentQueueDepth / serviceRate;
+    // Apply the queuing delay formula: (1/(1-x)³) - 1
+    // This directly gives us the queuing delay in milliseconds
+    const queuingDelayMs = (1 / Math.pow(1 - utilization, 3)) - 1;
     
-    return Math.min(avgWaitTime + currentDelay, 1.0);
+    // Return the delay in seconds
+    return queuingDelayMs / 1000;
   }
   
   /**
@@ -110,9 +111,7 @@ export class LatencyCalculator {
         // Use explicitly provided values for processing and queuing
         processing: hop.processingDelay !== undefined ? hop.processingDelay / 1000 : this.processingDelay(hop.deviceType, hop.loadFactor || 0.5),
         queuing: hop.queuingDelay !== undefined ? hop.queuingDelay / 1000 : this.queuingDelay(
-          hop.arrivalRate || 100,
-          hop.serviceRate || 1000,
-          hop.queueDepth || 0
+          hop.utilization || 0.3
         )
       };
       
@@ -218,9 +217,7 @@ export class NetworkHop {
     this.medium = config.medium || 'fiber';
     this.deviceType = config.deviceType || 'home_router';
     this.loadFactor = config.loadFactor || 0.3;
-    this.arrivalRate = config.arrivalRate || 100;
-    this.serviceRate = config.serviceRate || 1000;
-    this.queueDepth = config.queueDepth || 0;
+    this.utilization = config.utilization || 0.3;
   }
   
   /**
@@ -245,8 +242,8 @@ export class NetworkHop {
     if (this.loadFactor < 0 || this.loadFactor > 1) {
       errors.push('Load factor must be between 0 and 1');
     }
-    if (this.arrivalRate >= this.serviceRate) {
-      errors.push('Arrival rate must be less than service rate for stable queue');
+    if (this.utilization < 0 || this.utilization > 1) {
+      errors.push('Utilization must be between 0 and 1');
     }
     
     return { valid: errors.length === 0, errors };
@@ -274,7 +271,7 @@ export const NetworkPresets = {
         medium: 'wifi',
         deviceType: 'home_router',
         loadFactor: 0.3,
-        queueDepth: 2
+        utilization: 0.3
       }
     ]
   },
@@ -289,7 +286,7 @@ export const NetworkPresets = {
         medium: 'copper',
         deviceType: 'home_router',
         loadFactor: 0.1,
-        queueDepth: 0
+        utilization: 0
       },
       {
         name: 'Router to ISP',
@@ -298,7 +295,7 @@ export const NetworkPresets = {
         medium: 'fiber',
         deviceType: 'isp_router',
         loadFactor: 0.4,
-        queueDepth: 5
+        utilization: 5
       },
       {
         name: 'ISP to Game Server',
@@ -307,7 +304,7 @@ export const NetworkPresets = {
         medium: 'fiber',
         deviceType: 'core_router',
         loadFactor: 0.3,
-        queueDepth: 10
+        utilization: 10
       }
     ]
   },
@@ -322,7 +319,7 @@ export const NetworkPresets = {
         medium: 'copper',
         deviceType: 'switch',
         loadFactor: 0.2,
-        queueDepth: 1
+        utilization: 1
       },
       {
         name: 'Switch to Firewall',
@@ -331,7 +328,7 @@ export const NetworkPresets = {
         medium: 'fiber',
         deviceType: 'firewall',
         loadFactor: 0.5,
-        queueDepth: 20
+        utilization: 20
       },
       {
         name: 'Firewall to Core',
@@ -340,7 +337,7 @@ export const NetworkPresets = {
         medium: 'fiber',
         deviceType: 'core_router',
         loadFactor: 0.4,
-        queueDepth: 15
+        utilization: 15
       }
     ]
   },
@@ -355,7 +352,7 @@ export const NetworkPresets = {
         medium: 'satellite',
         deviceType: 'home_router',
         loadFactor: 0.3,
-        queueDepth: 5
+        utilization: 5
       },
       {
         name: 'Satellite to Ground Station',
@@ -364,7 +361,7 @@ export const NetworkPresets = {
         medium: 'satellite',
         deviceType: 'isp_router',
         loadFactor: 0.4,
-        queueDepth: 10
+        utilization: 10
       }
     ]
   }

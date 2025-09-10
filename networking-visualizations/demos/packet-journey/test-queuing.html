@@ -38,14 +38,13 @@
   <main class="container">
     <header class="page-header">
       <h1>🧪 Dynamic Queuing Delay Calculation</h1>
-      <p>Testing M/M/1 queue model for dynamic queuing delay based on utilization</p>
+      <p>Testing cubic formula for dynamic queuing delay based on utilization</p>
     </header>
 
     <div class="formula">
-      <strong>M/M/1 Queue Formula:</strong><br>
-      Queuing Delay = (ρ / (1 - ρ)) × Service Time<br>
-      Where: ρ = utilization (0 to 1)<br>
-      Service Time = packet_size / bandwidth
+      <strong>Cubic Queuing Formula:</strong><br>
+      Queuing Delay = (1 / (1 - ρ)³) - 1 milliseconds<br>
+      Where: ρ = utilization (0 to 1)
     </div>
 
     <div id="test-results"></div>
@@ -123,9 +122,14 @@
       if (testCase.hop.queuingDelay) {
         expectedQueuing = testCase.hop.queuingDelay;
       } else if (testCase.hop.utilization) {
-        const util = Math.min(testCase.hop.utilization, 0.99);
-        expectedQueuing = (util / (1 - util)) * serviceTime;
-        expectedQueuing = Math.min(expectedQueuing, 500);
+        // Use cubic formula directly
+        if (testCase.hop.utilization >= 0.95) {
+          expectedQueuing = 100;
+        } else if (testCase.hop.utilization < 0.05) {
+          expectedQueuing = 0.1;
+        } else {
+          expectedQueuing = (1 / Math.pow(1 - testCase.hop.utilization, 3)) - 1;
+        }
       }
       
       testDiv.innerHTML = `
@@ -160,11 +164,11 @@
       <div class="result">
         <p><strong>Dynamic Calculation:</strong></p>
         <ul>
-          <li>When only <code>utilization</code> is provided, queuing delay is calculated using M/M/1 model</li>
+          <li>When only <code>utilization</code> is provided, queuing delay is calculated using cubic formula</li>
           <li>Delay increases exponentially as utilization approaches 100%</li>
-          <li>At 50% utilization: queuing ≈ 1× service time</li>
-          <li>At 80% utilization: queuing ≈ 4× service time</li>
-          <li>At 95% utilization: queuing ≈ 19× service time</li>
+          <li>At 50% utilization: queuing ≈ 7 ms</li>
+          <li>At 80% utilization: queuing ≈ 125 ms</li>
+          <li>At 95%+ utilization: capped at 100 ms</li>
         </ul>
         
         <p><strong>Override Option:</strong></p>
@@ -176,7 +180,7 @@
         <p><strong>Safety:</strong></p>
         <ul>
           <li>Utilization capped at 99% to avoid infinity</li>
-          <li>Maximum queuing delay capped at 500ms for realism</li>
+          <li>Maximum queuing delay capped at 100ms for realism</li>
         </ul>
       </div>
     `;

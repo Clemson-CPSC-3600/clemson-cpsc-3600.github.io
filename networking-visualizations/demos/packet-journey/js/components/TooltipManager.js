@@ -280,10 +280,10 @@ export class TooltipManager {
       
       // Add queuing impact if high utilization
       if (link.utilization >= 0.7) {
-        const multiplier = (1 / Math.pow(1 - Math.min(link.utilization, 0.95), 3)) - 1;
+        const queuingDelay = (1 / Math.pow(1 - Math.min(link.utilization, 0.95), 3)) - 1;
         html += `<div class="tooltip-row">
-          <span class="tooltip-label">Queue Impact:</span>
-          <span class="tooltip-value">${multiplier.toFixed(1)}× transmission time</span>
+          <span class="tooltip-label">Queue Delay:</span>
+          <span class="tooltip-value">${queuingDelay.toFixed(1)} ms</span>
         </div>`;
       }
     }
@@ -506,27 +506,35 @@ export class TooltipManager {
     const height = rect.height;
     const padding = 10;
     
-    // Calculate position
-    let left = x - width / 2;
-    let top = y - height - 10; // Default to above cursor
+    // Get scroll offsets
+    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
     
-    // Keep tooltip on screen horizontally
-    if (left < padding) {
-      left = padding;
-    } else if (left + width > window.innerWidth - padding) {
-      left = window.innerWidth - width - padding;
+    // Calculate position (x, y are client coordinates, need to add scroll)
+    let left = x + scrollX - width / 2;
+    let top = y + scrollY - height - 10; // Default to above cursor
+    
+    // Get viewport bounds
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Keep tooltip on screen horizontally (check against viewport + scroll)
+    if (left < scrollX + padding) {
+      left = scrollX + padding;
+    } else if (left + width > scrollX + viewportWidth - padding) {
+      left = scrollX + viewportWidth - width - padding;
     }
     
-    // Keep tooltip on screen vertically
-    if (top < padding) {
-      top = y + 20; // Show below if not enough space above
+    // Keep tooltip on screen vertically (check against viewport + scroll)
+    if (top < scrollY + padding) {
+      top = y + scrollY + 20; // Show below if not enough space above
       // Remove the arrow pointing up and add one pointing down
       this.tooltip.style.setProperty('--arrow-direction', 'down');
     } else {
       this.tooltip.style.setProperty('--arrow-direction', 'up');
     }
     
-    // Apply position
+    // Apply position (absolute positioning from page top)
     this.tooltip.style.left = `${left}px`;
     this.tooltip.style.top = `${top}px`;
   }

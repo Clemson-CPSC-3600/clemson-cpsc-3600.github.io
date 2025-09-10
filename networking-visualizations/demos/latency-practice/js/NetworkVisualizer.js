@@ -125,9 +125,13 @@ export class NetworkVisualizer {
     });
     
     hops.forEach((hop, i) => {
+      // Support both 'name' and 'node' properties for backward compatibility
+      const hopName = hop.name || hop.node || `Hop ${i + 1}`;
+      const label = hopName.split(' ')[0] || hopName.split('→')[0] || hopName;
+      
       this.nodes.push({
         id: `hop-${i}`,
-        label: hop.name.split(' ')[0],
+        label: label.trim(),
         x: spacing * (i + 2),
         y: y,
         radius: 25,

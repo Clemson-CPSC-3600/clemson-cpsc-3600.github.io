@@ -15,7 +15,7 @@ export class LatencyVisualizer {
     
     // Visual configuration
     this.chartHeight = 120;
-    this.chartY = height - this.chartHeight - 40;
+    this.chartY = 320; // Fixed position closer to network viz
     this.barWidth = 40;
     this.barSpacing = 10;
     

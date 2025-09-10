@@ -65,7 +65,7 @@ export class CanvasPathRenderer {
     const nodeCount = hops.length;
     const totalWidth = (nodeCount - 1) * this.nodeSpacing;
     const startX = (this.width - totalWidth) / 2;
-    const y = this.height / 2 - 50; // Center vertically with offset for labels
+    const y = 150; // Move network visualization higher up
     
     hops.forEach((hop, index) => {
       positions.push({
@@ -381,7 +381,7 @@ export class CanvasPathRenderer {
     this.ctx.textBaseline = 'top';
     this.ctx.fillText(hop.node, position.x, position.y + this.nodeRadius + 8);
     
-    // Draw processing time if available
+    // Draw processing delay if available and non-zero
     if (data.delays && data.delays.processing > 0) {
       const processingStr = NetworkFormatter.time(data.delays.processing);
       this.ctx.fillStyle = COLORS.UI.TEXT_SECONDARY;

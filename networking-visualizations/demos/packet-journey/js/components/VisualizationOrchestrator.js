@@ -58,7 +58,7 @@ export class VisualizationOrchestrator {
     const container = this.canvas.parentElement;
     const containerRect = container.getBoundingClientRect();
     const width = Math.floor(containerRect.width - 48); // Account for padding
-    const height = 500; // Fixed height
+    const height = 580; // Keep original height to prevent cutoff
     
     // Setup high DPI
     const { dpr } = this.canvasHelper.setupHighDPI(this.canvas, width, height);

@@ -329,15 +329,17 @@ export const SIZES = {
 };
 ```
 
-### Phase 2: Refactor packet-journey Demo (Modified - 3-4 days) ✅ COMPLETED
+### Phase 2: Refactor packet-journey Demo ✅ COMPLETED (January 2025)
 
-#### Status: 90% Complete
+#### Status: 100% Complete
 - ✅ Created CanvasHelper utility (700+ lines with comprehensive Canvas operations)
 - ✅ Decomposed Visualization.js from 1,405 lines to 95 lines (93% reduction)
-- ✅ Created 5 specialized components totaling ~1,900 lines of modular code
+- ✅ Created 7 specialized components totaling ~2,300 lines of modular code
 - ✅ Full integration with shared utilities
-- ✅ Created test page with 3 test scenarios
-- 🔄 Scenario extraction to configuration (next task)
+- ✅ Scenario extraction to configuration with 10+ scenarios
+- ✅ Replaced original demo with refactored version
+- ✅ Added hop-by-hop breakdown table with detailed calculations
+- ✅ UI/UX improvements and simplifications
 
 #### Important: Canvas vs SVG Architecture Decision
 
@@ -467,7 +469,7 @@ export class CanvasHelper {
 
 #### 2.2 Decompose Visualization.js ✅ COMPLETED
 
-Break down the 1,405-line file into smaller, focused components:
+Successfully broke down the 1,405-line monolithic file into 7 focused components:
 
 **VisualizationOrchestrator.js** (~200 lines)
 ```javascript
@@ -502,89 +504,91 @@ export class VisualizationOrchestrator {
 }
 ```
 
-**CanvasPathRenderer.js** (~400 lines)
+**CanvasPathRenderer.js** (~400 lines) ✅
 - Renders network nodes and links using CanvasHelper
-- Applies consistent colors from constants
+- Displays medium type, bandwidth, distance, and utilization
 - Handles node positioning and layout
+- Shows processing delays and cumulative latency per node
 
-**PopupManager.js** (~300 lines)
-- Manages popup creation and positioning
+**PopupManager.js** (~300 lines) ✅
+- Manages popup creation and positioning for link details
 - Handles popup events and updates
-- Could become a shared component later
+- Displays detailed link properties when clicked
 
-**TooltipManager.js** (~200 lines)
-- Manages hover tooltips
+**TooltipManager.js** (~200 lines) ✅
+- Manages hover tooltips for nodes and links
 - Uses NetworkFormatter for display values
 - Consistent styling from constants
 
-**LatencyVisualizer.js** (~300 lines)
-- Visualizes delay breakdowns
+**LatencyVisualizer.js** (~300 lines) ✅
+- Visualizes delay breakdowns as stacked bar chart
 - Uses DelayCalculator for computations
-- Uses NetworkFormatter for display
+- Interactive hover tooltips on bars
+- Color-coded by delay type
 
-#### 2.2 Extract Configuration
+**HopBreakdownTable.js** (~450 lines) ✅ NEW
+- Detailed hop-by-hop latency breakdown table
+- Expandable rows with equation details
+- Shows transmission, propagation, processing, and queuing calculations
+- Educational format with formulas and values
 
-**configs/journeyScenarios.js**
-```javascript
-export const journeyScenarios = {
-  localNetwork: {
-    name: 'Local Network Transfer',
-    description: 'File transfer within a LAN',
-    packetSize: 1500,
-    fileSize: 10485760, // 10MB
-    path: {
-      nodes: [
-        { id: 'laptop', type: 'host', label: 'Laptop' },
-        { id: 'switch', type: 'switch', label: 'Gigabit Switch' },
-        { id: 'server', type: 'server', label: 'File Server' }
-      ],
-      hops: [
-        { 
-          from: 'laptop', 
-          to: 'switch',
-          bandwidth: 1e9,
-          distance: 10,
-          medium: 'ethernet'
-        },
-        {
-          from: 'switch',
-          to: 'server',
-          bandwidth: 1e9,
-          distance: 20,
-          medium: 'ethernet',
-          processingDelay: 0.01
-        }
-      ]
-    }
-  },
-  
-  internetPath: {
-    name: 'Internet Path',
-    description: 'Web request across the Internet',
-    packetSize: 1500,
-    path: {
-      nodes: [
-        { id: 'client', type: 'host', label: 'Your Computer' },
-        { id: 'router1', type: 'router', label: 'Home Router' },
-        { id: 'isp1', type: 'router', label: 'ISP Router' },
-        { id: 'backbone', type: 'router', label: 'Internet Backbone' },
-        { id: 'cdn', type: 'server', label: 'CDN Server' }
-      ],
-      hops: [
-        {
-          from: 'client',
-          to: 'router1',
-          bandwidth: 100e6,
-          distance: 5,
-          medium: 'wireless',
-          processingDelay: 0.5
-        },
-        // ... more hops
-      ]
-    }
-  }
-};
-```
+**ScenarioManager.js** (~420 lines) ✅
+- Manages scenario loading and selection
+- Generate Variation and Reset buttons
+- Scenario info display with difficulty levels
+- Tooltips explaining button functions
+
+#### 2.3 Extract Configuration ✅ COMPLETED
+
+**configs/journeyScenarios.js** (1,200+ lines)
+
+Created comprehensive scenario configuration system with:
+- 10+ predefined scenarios across 3 difficulty levels
+- Each scenario includes:
+  - Network topology (nodes and links)
+  - Link properties: bandwidth, distance, medium type, utilization
+  - Node properties: processing delays, CPU load, device types
+  - Realistic network conditions
+
+Key scenarios implemented:
+- **Beginner**: Home Network, Local Data Center, Coffee Shop WiFi
+- **Intermediate**: Campus Network, Cloud Service, Video Streaming
+- **Advanced**: Global CDN, Satellite Network, High-Frequency Trading
+
+All scenarios include proper medium types (fiber, copper, wireless, satellite) with correct propagation speeds:
+- Fiber/Copper: 2×10⁸ m/s (~2/3 speed of light)
+- Wireless/Satellite: 3×10⁸ m/s (speed of light in air/vacuum)
+
+#### 2.4 Key Refactoring Improvements
+
+**Propagation Speed Accuracy** ✅
+- Updated DelayCalculator with PROPAGATION_SPEEDS constant
+- Different speeds for different media types
+- Accurate physics-based calculations
+
+**Final Node Fix** ✅
+- Last node correctly shows only processing delay
+- No outgoing link delays for destination
+- Cleaner hop-by-hop breakdown
+
+**Processing Delay Clarification** ✅
+- Static values based on device type
+- Not computed from CPU load
+- Clear labeling in breakdown table
+
+**UI/UX Improvements** ✅
+- Removed redundant equations section
+- Removed suitable applications panel
+- Fixed packet size at 1500 bytes (standard MTU)
+- Reordered controls for better flow
+- Added explanatory tooltips
+- Improved control layout and spacing
+
+**Educational Enhancements** ✅
+- Transmission delay shows bytes-to-bits conversion
+- Expandable equation details in breakdown table
+- Clear formulas with actual values
+- Visual link labels showing medium type
 
 ### Phase 3: Refactor latency-practice Demo (Week 3)
 
@@ -928,12 +932,15 @@ const PACKET_COLOR = COLORS.PACKET.DEFAULT;
 - [x] Create shared constants modules
 - [x] Write comprehensive tests for shared utilities
 
-### Week 2: packet-journey Refactoring (Modified - 3-4 days)
-- [ ] Create CanvasHelper utility for Canvas operations
-- [ ] Decompose Visualization.js into 5 focused components
-- [ ] Integrate shared utilities (NetworkFormatter, DelayCalculator, constants)
-- [ ] Extract scenarios to configuration
-- [ ] Keep Canvas rendering (no SVG migration)
+### Week 2: packet-journey Refactoring ✅ **COMPLETED (January 2025)**
+- [x] Create CanvasHelper utility for Canvas operations
+- [x] Decompose Visualization.js into 7 focused components
+- [x] Integrate shared utilities (NetworkFormatter, DelayCalculator, constants)
+- [x] Extract scenarios to configuration (10+ scenarios)
+- [x] Keep Canvas rendering (no SVG migration)
+- [x] Add HopBreakdownTable component for detailed calculations
+- [x] Fix propagation speeds for different media types
+- [x] UI/UX improvements and simplifications
 
 ### Week 3: latency-practice Refactoring  
 - [ ] Simplify LatencyCalculator with shared utilities
@@ -1059,6 +1066,101 @@ Instead of forcing all demos to use the same rendering technology, we will:
 - Better text rendering
 - Resolution independence
 - Accessibility (screen readers)
+
+## Phase 2 Completion Report (January 2025)
+
+### Packet Journey Demo Refactoring Complete
+
+#### What Was Delivered
+
+Successfully refactored the packet-journey demo from a monolithic 1,405-line file into a modular, maintainable architecture:
+
+**Original Structure**:
+- `Visualization.js`: 1,405 lines (monolithic)
+- `Controls.js`: 489 lines
+- `NetworkPath.js`: 329 lines
+- Total: ~2,466 lines with high coupling
+
+**New Structure**:
+- `VisualizationRefactored.js`: 95 lines (orchestrator)
+- 7 specialized components: ~2,300 lines total
+- Configuration-driven scenarios: 1,200+ lines
+- Full integration with shared utilities
+- Total: More modular, testable, and maintainable
+
+#### Components Created
+
+1. **VisualizationOrchestrator.js** (390 lines)
+   - Main coordinator for all visualization components
+   - Handles canvas setup and event management
+   - Integrates all sub-components seamlessly
+
+2. **CanvasPathRenderer.js** (364 lines)
+   - Network topology rendering with device icons
+   - Link labels showing bandwidth, distance, medium, utilization
+   - Node status visualization with processing delays
+
+3. **HopBreakdownTable.js** (450 lines)
+   - Detailed hop-by-hop latency calculations
+   - Expandable rows with mathematical equations
+   - Educational format showing formulas and actual values
+   - Correctly handles final node (destination) with only processing delay
+
+4. **LatencyVisualizer.js** (300 lines)
+   - Stacked bar chart for delay components
+   - Interactive hover tooltips
+   - Color-coded by delay type
+
+5. **ScenarioManager.js** (424 lines)
+   - Scenario selection interface
+   - Generate Variation button for realistic conditions
+   - Reset functionality
+   - Informative tooltips
+
+6. **PopupManager.js** & **TooltipManager.js** (500+ lines combined)
+   - Interactive popups for link details
+   - Hover tooltips for nodes and links
+   - Consistent formatting using NetworkFormatter
+
+#### Key Technical Improvements
+
+1. **Accurate Physics Modeling**
+   - Correct propagation speeds per medium type
+   - Fiber/Copper: 2×10⁸ m/s
+   - Wireless/Satellite: 3×10⁸ m/s
+
+2. **Educational Enhancements**
+   - Clear bytes-to-bits conversion in equations
+   - Static processing delays with clear labeling
+   - Expandable detail sections for learning
+
+3. **UI/UX Refinements**
+   - Removed redundant elements (equations section, suitable apps)
+   - Fixed packet size at standard 1500 byte MTU
+   - Improved control layout and flow
+   - Added helpful tooltips throughout
+
+4. **Configuration System**
+   - 10+ realistic network scenarios
+   - Beginner, Intermediate, and Advanced difficulties
+   - Random variation generation for real-world conditions
+   - Comprehensive link and node properties
+
+#### Files Modified/Created
+
+- **Created**: 7 new component files in `js/components/`
+- **Created**: `configs/journeyScenarios.js` with 10+ scenarios
+- **Modified**: `shared/utils/DelayCalculator.js` with propagation speeds
+- **Replaced**: Original `index.html` and `main.js` with refactored versions
+- **Backed up**: Original files as `index-original.html` and `main-original.js`
+
+#### Impact Metrics
+
+- **Code Organization**: 93% reduction in main file size (1,405 → 95 lines)
+- **Modularity**: 7 focused components vs 1 monolithic file
+- **Reusability**: Full integration with shared utilities
+- **Maintainability**: Clear separation of concerns
+- **Educational Value**: Enhanced with detailed breakdowns and accurate physics
 
 ## Phase 1 Completion Report (December 2024)
 

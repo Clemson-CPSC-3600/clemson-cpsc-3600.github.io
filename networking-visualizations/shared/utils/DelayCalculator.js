@@ -75,31 +75,11 @@ export class DelayCalculator {
     if (hop.queuingDelay && hop.queuingDelay > 0) {
       // Use explicit queuing delay if provided
       delays.queuing = hop.queuingDelay;
-    } else if (hop.utilization && hop.utilization > 0 && hop.bandwidth) {
-      // Use the same exponential model as in other parts of the codebase
+    } else if (hop.utilization && hop.utilization > 0) {
+      // Use cubic formula directly for queuing delay in milliseconds
       // Formula: (1 / (1 - utilization)³) - 1
       // This gives an exponential-like increase as utilization approaches 100%
-      const util = Math.min(hop.utilization, 0.99); // Cap at 99% to avoid infinite values
-      
-      // Base delay is transmission time for one packet
-      const transmissionTimeMs = (packetBits / hop.bandwidth) * this.MS_PER_SECOND;
-      
-      // Calculate multiplier using the cubic formula
-      // This formula gives approximately:
-      // - 0.3% util → ~0x delay
-      // - 30% util → ~0.5x delay
-      // - 50% util → ~7x delay
-      // - 70% util → ~36x delay
-      // - 80% util → ~125x delay
-      // - 90% util → ~1000x delay
-      // - 95% util → ~8000x delay
-      // - 99% util → ~1,000,000x delay
-      const multiplier = (1 / Math.pow(1 - util, 3)) - 1;
-      
-      delays.queuing = transmissionTimeMs * multiplier;
-      
-      // Cap maximum queuing delay at 5000ms (5 seconds) - realistic for severely congested links
-      delays.queuing = Math.min(delays.queuing, 5000);
+      delays.queuing = this.estimateQueuingDelay(hop.utilization);
     }
     
     // Calculate total delay for this hop
@@ -323,33 +303,27 @@ export class DelayCalculator {
   }
   
   /**
-   * Estimate queuing delay using M/M/1 queue model
-   * @param {number} arrivalRate - Packet arrival rate (packets/second)
-   * @param {number} serviceRate - Service rate (packets/second)
-   * @returns {Object} Queuing statistics
+   * Estimate queuing delay using cubic utilization model
+   * @param {number} utilization - Link utilization (0-1)
+   * @returns {number} Queuing delay in milliseconds
    */
-  static estimateQueuingDelay(arrivalRate, serviceRate) {
-    if (serviceRate <= arrivalRate) {
-      // Queue is unstable
-      return {
-        stable: false,
-        utilization: 1,
-        averageDelay: Infinity,
-        averageQueueLength: Infinity
-      };
+  static estimateQueuingDelay(utilization) {
+    // If queue is unstable (utilization >= 95%), return high delay
+    if (utilization >= 0.95) {
+      return 100; // 100ms max queuing delay
     }
     
-    const utilization = arrivalRate / serviceRate;
-    const averageDelay = 1 / (serviceRate - arrivalRate) * this.MS_PER_SECOND;
-    const averageQueueLength = utilization / (1 - utilization);
+    // If very low utilization, minimal queuing
+    if (utilization < 0.05) {
+      return 0.1; // 0.1ms minimal queuing delay
+    }
     
-    return {
-      stable: true,
-      utilization: utilization,
-      averageDelay: averageDelay,
-      averageQueueLength: averageQueueLength,
-      waitingProbability: utilization
-    };
+    // Apply the queuing delay formula: (1/(1-x)³) - 1
+    // This directly gives us the queuing delay in milliseconds
+    const queuingDelay = (1 / Math.pow(1 - utilization, 3)) - 1;
+    
+    // Return the delay directly (already in milliseconds)
+    return queuingDelay;
   }
   
   /**

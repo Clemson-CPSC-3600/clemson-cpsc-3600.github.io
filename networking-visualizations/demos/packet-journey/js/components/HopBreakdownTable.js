@@ -337,8 +337,8 @@ export class HopBreakdownTable {
           <div class="equation-card">
             <h5>⏳ Queuing Delay</h5>
             <div class="equation">
-              <span class="formula">Transmission Time × ((1/(1-u)³) - 1)</span>
-              <span class="calculation">= ${NetworkFormatter.time(data.delays.transmission)} × ((1/(1-${(hop.utilization || 0).toFixed(2)})³) - 1)</span>
+              <span class="formula">(1/(1-u)³) - 1 milliseconds</span>
+              <span class="calculation">= (1/(1-${(hop.utilization || 0).toFixed(2)})³) - 1</span>
               <span class="calculation">Utilization u = ${Math.round((hop.utilization || 0) * 100)}%</span>
               <span class="result">= ${NetworkFormatter.time(data.delays.queuing)}</span>
             </div>
