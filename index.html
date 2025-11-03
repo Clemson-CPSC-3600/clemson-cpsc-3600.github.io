@@ -3,234 +3,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Interactive visualizations for learning networking concepts including TCP/IP, routing algorithms, and network protocols">
-  <title>Networking Visualizations - Learn Network Concepts Interactively</title>
-  
-  <style>
-    :root {
-      --color-primary: #3498db;
-      --color-success: #2ecc71;
-      --color-warning: #f39c12;
-      --color-danger: #e74c3c;
-      --color-node: #4a90e2;
-      --color-packet: #2ecc71;
-      --color-background: #f8f9fa;
-      --color-text: #2c3e50;
-      --color-border: #ddd;
-      --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      font-size: 16px;
-      line-height: 1.6;
-      color: var(--color-text);
-      background-color: var(--color-background);
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-    
-    .hero {
-      background: linear-gradient(135deg, var(--color-primary), #2980b9);
-      color: white;
-      padding: 4rem 2rem;
-      text-align: center;
-      margin-bottom: 3rem;
-    }
-    
-    .hero h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-    
-    .hero p {
-      font-size: 1.25rem;
-      opacity: 0.95;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      margin-bottom: 3rem;
-    }
-    
-    .feature-card {
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    
-    .feature-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    }
-    
-    .feature-card h3 {
-      color: var(--color-primary);
-      margin-bottom: 1rem;
-    }
-    
-    .feature-card .icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-    }
-    
-    .feature-card a {
-      display: inline-block;
-      margin-top: 1rem;
-      color: var(--color-primary);
-      text-decoration: none;
-      font-weight: bold;
-    }
-    
-    .feature-card a:hover {
-      text-decoration: underline;
-    }
-    
-    .quick-start {
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      margin-bottom: 3rem;
-    }
-    
-    .quick-start h2 {
-      color: var(--color-primary);
-      margin-bottom: 1.5rem;
-    }
-    
-    .demo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-    
-    .demo-link {
-      background: var(--color-background);
-      padding: 1rem;
-      border-radius: 4px;
-      text-align: center;
-      text-decoration: none;
-      color: var(--color-text);
-      transition: background 0.3s;
-    }
-    
-    .demo-link:hover {
-      background: var(--color-primary);
-      color: white;
-    }
-    
-    .demo-link .emoji {
-      font-size: 2rem;
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-  </style>
+  <meta name="description" content="CPSC 3600 Computer Networks - Interactive learning platform with visualizations, demos, and practice problems">
+  <meta name="keywords" content="networking, computer networks, TCP/IP, protocols, education, visualizations">
+  <title>CPSC 3600 - Computer Networks | Clemson University</title>
+
+  <link rel="stylesheet" href="./shared/styles/main.css">
+  <link rel="stylesheet" href="./shared/styles/module.css">
+  <link rel="stylesheet" href="./shared/styles/components.css">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <div class="hero">
+  <header class="site-header">
     <div class="container">
-      <h1>Networking Visualizations</h1>
-      <p>Learn networking concepts through interactive visualizations and hands-on demonstrations</p>
+      <h1 class="site-logo">CPSC 3600: Computer Networks</h1>
     </div>
-  </div>
-  
+  </header>
+
   <main>
-    <div class="container">
-      <div class="features">
-        <div class="feature-card">
-          <div class="icon">🎮</div>
-          <h3>Interactive Demos</h3>
-          <p>Explore networking concepts through interactive simulations. Watch packets travel, see protocols in action, and understand how networks communicate.</p>
-          <a href="./demos/">Explore Demos →</a>
-        </div>
-        
-        <div class="feature-card">
-          <div class="icon">📚</div>
-          <h3>Step-by-Step Tutorials</h3>
-          <p>Learn at your own pace with guided tutorials. Each lesson breaks down complex topics into easy-to-understand steps with visual aids.</p>
-          <a href="./tutorials/">Start Learning →</a>
-        </div>
-        
-        <div class="feature-card">
-          <div class="icon">💻</div>
-          <h3>Code Examples</h3>
-          <p>See real implementation examples with syntax highlighting and explanations. Copy code snippets to use in your own projects.</p>
-          <a href="./examples/">View Examples →</a>
+    <section class="hero">
+      <div class="container">
+        <h1>Learn Networking Through Interactive Visualizations</h1>
+        <p class="hero-subtitle">
+          Master computer networking concepts with hands-on demos, step-by-step lessons,
+          and practice problems designed for CPSC 3600 at Clemson University.
+        </p>
+      </div>
+    </section>
+
+    <section class="course-overview">
+      <div class="container">
+        <h2>Course Structure</h2>
+        <p class="intro-text">
+          This course is organized into six modules, each covering a key aspect of computer networks.
+          Work through lessons, explore interactive demos, and test your knowledge with practice problems.
+        </p>
+
+        <div id="modules-container" class="modules-grid">
+          <!-- Module cards will be dynamically inserted here -->
         </div>
       </div>
-      
-      <div class="quick-start">
-        <h2>🚀 Quick Start</h2>
-        <p>Jump right into our most popular networking visualizations:</p>
-        
-        <div class="demo-grid">
-          <a href="./demos/tcp-handshake/" class="demo-link">
-            <span class="emoji">🤝</span>
-            <span>TCP Handshake</span>
-          </a>
-          
-          <a href="./demos/packet-routing/" class="demo-link">
-            <span class="emoji">📦</span>
-            <span>Packet Routing</span>
-          </a>
-          
-          <a href="./demos/dns-lookup/" class="demo-link">
-            <span class="emoji">🔍</span>
-            <span>DNS Lookup</span>
-          </a>
-          
-          <a href="./demos/osi-layers/" class="demo-link">
-            <span class="emoji">📊</span>
-            <span>OSI Layers</span>
+    </section>
+
+    <section class="features">
+      <div class="container">
+        <h2>What You'll Learn</h2>
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-icon">🌐</div>
+            <h3>Internet Architecture</h3>
+            <p>Understand how the Internet is structured, from edge networks to the core</p>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">📡</div>
+            <h3>Protocol Layers</h3>
+            <p>Master the five-layer protocol stack and how data flows through networks</p>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">⚡</div>
+            <h3>Network Performance</h3>
+            <p>Learn to analyze delay, throughput, and optimize network performance</p>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon">🔐</div>
+            <h3>Security Fundamentals</h3>
+            <p>Explore encryption, authentication, and secure communication protocols</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="learning-approach">
+      <div class="container">
+        <h2>Three Ways to Learn</h2>
+        <div class="approach-grid">
+          <div class="approach-card">
+            <div class="approach-number">1</div>
+            <h3>📚 Read Lessons</h3>
+            <p>
+              Each module includes detailed lessons that explain networking concepts
+              with clear diagrams and real-world examples.
+            </p>
+          </div>
+
+          <div class="approach-card">
+            <div class="approach-number">2</div>
+            <h3>🎮 Explore Demos</h3>
+            <p>
+              Interactive visualizations let you see protocols in action, adjust
+              parameters, and understand how networks really work.
+            </p>
+          </div>
+
+          <div class="approach-card">
+            <div class="approach-number">3</div>
+            <h3>✏️ Practice Problems</h3>
+            <p>
+              Test your understanding with practice problems that provide immediate
+              feedback and hints to help you learn.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="get-started">
+      <div class="container">
+        <div class="cta-box">
+          <h2>Ready to Get Started?</h2>
+          <p>Begin with Module 1 to learn the big picture of computer networking.</p>
+          <a href="./modules/module1-big-picture/" class="btn btn-primary btn-large">
+            Start Learning →
           </a>
         </div>
       </div>
-      
-      <div class="quick-start">
-        <h2>📖 Topics Covered</h2>
-        <ul style="columns: 2; column-gap: 2rem; margin-left: 2rem;">
-          <li>TCP/IP Protocol Suite</li>
-          <li>Three-Way Handshake</li>
-          <li>Packet Switching</li>
-          <li>Routing Algorithms</li>
-          <li>DNS Resolution</li>
-          <li>HTTP/HTTPS</li>
-          <li>OSI Model</li>
-          <li>Network Topologies</li>
-          <li>IP Addressing</li>
-          <li>Subnetting</li>
-          <li>NAT/PAT</li>
-          <li>Load Balancing</li>
-        </ul>
-      </div>
-    </div>
+    </section>
   </main>
-  
+
   <footer class="site-footer">
-    <p>© 2024 Networking Visualizations | 
-       <a href="./about/">About</a> | 
-       <a href="https://github.com/clemson-cpsc-3600/networking-visualizations">GitHub</a>
-    </p>
+    <div class="container">
+      <p>&copy; 2025 Clemson University - CPSC 3600</p>
+      <p>
+        <a href="https://github.com/Clemson-CPSC-3600/clemson-cpsc-3600.github.io" target="_blank" rel="noopener">
+          View on GitHub
+        </a>
+      </p>
+    </div>
   </footer>
-  
+
   <script type="module" src="./main.js"></script>
 </body>
 </html>

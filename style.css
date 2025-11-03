@@ -1,0 +1,231 @@
+/**
+ * Home Page Specific Styles
+ * Styles unique to the course home page
+ */
+
+/* Hero section */
+.hero {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: white;
+  padding: var(--space-20) var(--space-8);
+  text-align: center;
+  margin-bottom: var(--space-16);
+}
+
+.hero h1 {
+  font-size: var(--font-size-5xl);
+  margin-bottom: var(--space-6);
+  line-height: var(--line-height-tight);
+}
+
+.hero-subtitle {
+  font-size: var(--font-size-xl);
+  opacity: 0.95;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: var(--line-height-relaxed);
+}
+
+/* Course overview section */
+.course-overview {
+  margin-bottom: var(--space-16);
+}
+
+.course-overview h2 {
+  text-align: center;
+  color: var(--color-primary);
+  margin-bottom: var(--space-6);
+}
+
+.intro-text {
+  text-align: center;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-light);
+  max-width: 800px;
+  margin: 0 auto var(--space-12);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Modules grid */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: var(--space-8);
+}
+
+/* Features section */
+.features {
+  background: var(--color-background-alt);
+  padding: var(--space-16) 0;
+  margin-bottom: var(--space-16);
+}
+
+.features h2 {
+  text-align: center;
+  color: var(--color-primary);
+  margin-bottom: var(--space-12);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-8);
+}
+
+.feature-item {
+  text-align: center;
+  padding: var(--space-6);
+}
+
+.feature-icon {
+  font-size: 4rem;
+  margin-bottom: var(--space-4);
+}
+
+.feature-item h3 {
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+}
+
+.feature-item p {
+  color: var(--color-text-light);
+  margin-bottom: 0;
+}
+
+/* Learning approach section */
+.learning-approach {
+  margin-bottom: var(--space-16);
+}
+
+.learning-approach h2 {
+  text-align: center;
+  color: var(--color-primary);
+  margin-bottom: var(--space-12);
+}
+
+.approach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-8);
+}
+
+.approach-card {
+  background: var(--color-background-alt);
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  text-align: center;
+  position: relative;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.approach-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-md);
+}
+
+.approach-number {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  width: 48px;
+  height: 48px;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.approach-card h3 {
+  margin-top: var(--space-12);
+  margin-bottom: var(--space-4);
+  color: var(--color-text);
+}
+
+.approach-card p {
+  color: var(--color-text-light);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: 0;
+}
+
+/* Get started section */
+.get-started {
+  background: var(--color-background-alt);
+  padding: var(--space-16) 0;
+  margin-bottom: 0;
+}
+
+.cta-box {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  padding: var(--space-12);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.cta-box h2 {
+  color: white;
+  margin-bottom: var(--space-4);
+}
+
+.cta-box p {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-8);
+  opacity: 0.95;
+}
+
+.btn-large {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero {
+    padding: var(--space-12) var(--space-4);
+  }
+
+  .hero h1 {
+    font-size: var(--font-size-4xl);
+  }
+
+  .hero-subtitle {
+    font-size: var(--font-size-lg);
+  }
+
+  .modules-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .features-grid,
+  .approach-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .approach-number {
+    position: static;
+    margin: 0 auto var(--space-4);
+  }
+
+  .approach-card h3 {
+    margin-top: 0;
+  }
+
+  .cta-box {
+    padding: var(--space-8) var(--space-6);
+  }
+}
+
+@media (min-width: 1200px) {
+  .modules-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
