@@ -1,0 +1,286 @@
+/**
+ * Practice Page Styles
+ * Styles for practice problem pages
+ */
+
+.practice-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--space-8);
+}
+
+.practice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-6);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.practice-header h1 {
+  margin: 0;
+}
+
+.practice-stats {
+  display: flex;
+  gap: var(--space-6);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.practice-stats span {
+  color: var(--color-module, var(--color-primary));
+}
+
+/* Practice layout */
+.practice-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+/* Problem area */
+.problem-area {
+  background: var(--color-background-alt);
+  padding: var(--space-8);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+}
+
+#problem-container {
+  margin-bottom: var(--space-8);
+  line-height: var(--line-height-relaxed);
+}
+
+#problem-container h3 {
+  color: var(--color-module, var(--color-primary));
+  margin-bottom: var(--space-4);
+}
+
+#problem-container .problem-diagram {
+  margin: var(--space-6) 0;
+  text-align: center;
+}
+
+#problem-container .problem-diagram img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+
+/* Answer area */
+.answer-area {
+  margin: var(--space-8) 0;
+}
+
+#answer-form {
+  margin-bottom: var(--space-4);
+}
+
+#answer-form label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+#answer-form input[type="text"],
+#answer-form input[type="number"],
+#answer-form textarea {
+  width: 100%;
+  padding: var(--space-3);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
+  font-family: var(--font-sans);
+  margin-bottom: var(--space-4);
+  transition: border-color var(--transition-fast);
+}
+
+#answer-form input:focus,
+#answer-form textarea:focus {
+  outline: none;
+  border-color: var(--color-module, var(--color-primary));
+}
+
+#answer-form textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: var(--font-mono);
+}
+
+.answer-area button {
+  margin-right: var(--space-3);
+}
+
+/* Feedback */
+#feedback {
+  margin-top: var(--space-6);
+  padding: var(--space-6);
+  border-radius: var(--radius-md);
+  border-left: 4px solid;
+}
+
+#feedback.correct {
+  background: rgba(46, 204, 113, 0.1);
+  border-color: var(--color-success);
+}
+
+#feedback.incorrect {
+  background: rgba(231, 76, 60, 0.1);
+  border-color: var(--color-danger);
+}
+
+#feedback h4 {
+  margin-bottom: var(--space-3);
+}
+
+#feedback.correct h4 {
+  color: var(--color-success);
+}
+
+#feedback.incorrect h4 {
+  color: var(--color-danger);
+}
+
+/* Practice sidebar */
+.practice-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.practice-sidebar section {
+  background: var(--color-background-alt);
+  padding: var(--space-6);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+}
+
+.practice-sidebar h2 {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 2px solid var(--color-border);
+  color: var(--color-module, var(--color-primary));
+}
+
+/* Formula reference */
+.formula-list {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+}
+
+.formula-list .formula {
+  margin-bottom: var(--space-3);
+  padding: var(--space-2);
+  background: var(--color-background);
+  border-radius: var(--radius-sm);
+}
+
+.formula-list .formula-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+/* Problem navigation list */
+#problem-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#problem-nav li {
+  margin-bottom: var(--space-2);
+}
+
+#problem-nav button {
+  width: 100%;
+  text-align: left;
+  padding: var(--space-3);
+  background: var(--color-background);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-fast);
+}
+
+#problem-nav button:hover {
+  background: var(--color-primary-light);
+  color: white;
+}
+
+#problem-nav button.active {
+  background: var(--color-module, var(--color-primary));
+  color: white;
+  border-color: var(--color-module, var(--color-primary));
+}
+
+#problem-nav button.completed {
+  background: var(--color-success);
+  color: white;
+}
+
+/* Practice navigation */
+.practice-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  padding-top: var(--space-8);
+  border-top: 2px solid var(--color-border);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .practice-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .practice-sidebar {
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .practice-container {
+    padding: var(--space-4);
+  }
+
+  .practice-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .practice-stats {
+    flex-direction: column;
+    gap: var(--space-2);
+    width: 100%;
+  }
+
+  .problem-area {
+    padding: var(--space-4);
+  }
+
+  .answer-area button {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: var(--space-2);
+  }
+
+  .practice-navigation {
+    flex-direction: column;
+  }
+
+  .practice-navigation .btn {
+    width: 100%;
+  }
+}

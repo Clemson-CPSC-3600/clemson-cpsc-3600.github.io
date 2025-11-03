@@ -1,9 +1,57 @@
 /**
  * Shared color constants for all networking visualizations
- * Provides consistent color scheme across demos
+ * Provides consistent color scheme across demos and site UI
  */
 
 export const COLORS = {
+  // Module colors (for curriculum organization)
+  MODULES: {
+    MODULE1: '#3498db',  // Blue - Big Picture
+    MODULE2: '#2ecc71',  // Green - Application Layer
+    MODULE3: '#9b59b6',  // Purple - Transport Layer
+    MODULE4: '#e74c3c',  // Red - Network Layer
+    MODULE5: '#f39c12',  // Orange - Link Layer
+    MODULE6: '#34495e'   // Dark Gray - Security
+  },
+
+  // Primary brand colors
+  PRIMARY: '#3498db',         // Blue
+  PRIMARY_DARK: '#2980b9',    // Dark blue
+  PRIMARY_LIGHT: '#5dade2',   // Light blue
+  SECONDARY: '#2ecc71',       // Green
+  SECONDARY_DARK: '#27ae60',  // Dark green
+  SECONDARY_LIGHT: '#58d68d', // Light green
+
+  // Semantic colors
+  SUCCESS: '#2ecc71',         // Green
+  WARNING: '#f39c12',         // Orange
+  DANGER: '#e74c3c',          // Red
+  INFO: '#3498db',            // Blue
+
+  // UI colors
+  BACKGROUND: '#f8f9fa',      // Light gray background
+  BACKGROUND_ALT: '#ffffff',  // White
+  TEXT: '#2c3e50',            // Dark blue-gray
+  TEXT_LIGHT: '#7f8c8d',      // Medium gray
+  TEXT_MUTED: '#95a5a6',      // Light gray
+  BORDER: '#ddd',             // Light border
+  BORDER_DARK: '#bdc3c7',     // Darker border
+
+  // Interactive states
+  HOVER: '#5dade2',           // Light blue
+  ACTIVE: '#2980b9',          // Dark blue
+  DISABLED: '#95a5a6',        // Light gray
+  FOCUS: '#3498db',           // Blue
+
+  // Code highlighting
+  CODE_BACKGROUND: '#f4f4f4', // Light gray
+  CODE_BORDER: '#ddd',        // Light border
+  CODE_KEYWORD: '#d73a49',    // Red
+  CODE_STRING: '#032f62',     // Dark blue
+  CODE_COMMENT: '#6a737d',    // Gray
+  CODE_FUNCTION: '#6f42c1',   // Purple
+
+
   // Packet types
   PACKET: {
     DEFAULT: '#2ecc71',      // Green
