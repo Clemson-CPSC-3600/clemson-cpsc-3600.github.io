@@ -41,6 +41,18 @@ export default defineConfig({
   },
   server: {
     open: true,
-    port: 3000
+    port: 3000,
+    // Fix for Firefox Developer Edition 431 error
+    headers: {
+      'Cache-Control': 'no-cache'
+    },
+    hmr: {
+      // Reduce HMR header size
+      overlay: true
+    }
+  },
+  // Optimize dependencies to reduce header size
+  optimizeDeps: {
+    include: []
   }
 });

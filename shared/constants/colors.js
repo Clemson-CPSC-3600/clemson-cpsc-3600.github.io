@@ -4,23 +4,23 @@
  */
 
 export const COLORS = {
-  // Module colors (for curriculum organization)
+  // Module colors (for curriculum organization) - Professional palette
   MODULES: {
-    MODULE1: '#3498db',  // Blue - Big Picture
-    MODULE2: '#2ecc71',  // Green - Application Layer
-    MODULE3: '#9b59b6',  // Purple - Transport Layer
-    MODULE4: '#e74c3c',  // Red - Network Layer
-    MODULE5: '#f39c12',  // Orange - Link Layer
-    MODULE6: '#34495e'   // Dark Gray - Security
+    MODULE1: '#2563eb',  // Deep Blue - Big Picture
+    MODULE2: '#059669',  // Forest Green - Application Layer
+    MODULE3: '#7c3aed',  // Deep Purple - Transport Layer
+    MODULE4: '#dc2626',  // Professional Red - Network Layer
+    MODULE5: '#ea580c',  // Burnt Orange - Link Layer
+    MODULE6: '#1e293b'   // Slate - Security
   },
 
-  // Primary brand colors
-  PRIMARY: '#3498db',         // Blue
-  PRIMARY_DARK: '#2980b9',    // Dark blue
-  PRIMARY_LIGHT: '#5dade2',   // Light blue
-  SECONDARY: '#2ecc71',       // Green
-  SECONDARY_DARK: '#27ae60',  // Dark green
-  SECONDARY_LIGHT: '#58d68d', // Light green
+  // Primary brand colors - Professional palette
+  PRIMARY: '#2563eb',         // Deep Blue
+  PRIMARY_DARK: '#1e40af',    // Rich Navy
+  PRIMARY_LIGHT: '#60a5fa',   // Softer Accent
+  SECONDARY: '#059669',       // Forest Green
+  SECONDARY_DARK: '#047857',  // Deeper Green
+  SECONDARY_LIGHT: '#34d399', // Light Green
 
   // Semantic colors
   SUCCESS: '#2ecc71',         // Green
@@ -28,14 +28,14 @@ export const COLORS = {
   DANGER: '#e74c3c',          // Red
   INFO: '#3498db',            // Blue
 
-  // UI colors
-  BACKGROUND: '#f8f9fa',      // Light gray background
+  // UI colors - Improved contrast
+  BACKGROUND: '#f8fafc',      // Cooler light gray
   BACKGROUND_ALT: '#ffffff',  // White
-  TEXT: '#2c3e50',            // Dark blue-gray
-  TEXT_LIGHT: '#7f8c8d',      // Medium gray
-  TEXT_MUTED: '#95a5a6',      // Light gray
-  BORDER: '#ddd',             // Light border
-  BORDER_DARK: '#bdc3c7',     // Darker border
+  TEXT: '#1e293b',            // Slate (better contrast)
+  TEXT_LIGHT: '#64748b',      // Slate gray
+  TEXT_MUTED: '#94a3b8',      // Light slate
+  BORDER: '#e2e8f0',          // Subtle blue-gray
+  BORDER_DARK: '#cbd5e1',     // Slate border
 
   // Interactive states
   HOVER: '#5dade2',           // Light blue

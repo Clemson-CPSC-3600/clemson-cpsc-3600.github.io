@@ -13,41 +13,43 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <header class="site-header">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header" role="banner">
     <div class="container">
-      <h1 class="site-logo">CPSC 3600: Computer Networks</h1>
+      <h1 class="site-logo">
+        <a href="/" aria-label="CPSC 3600 Computer Networks Home">CPSC 3600: Computer Networks</a>
+      </h1>
     </div>
   </header>
 
-  <main>
-    <section class="hero">
+  <main id="main-content" role="main">
+    <section class="page-header" aria-labelledby="page-title">
       <div class="container">
-        <h1>Learn Networking Through Interactive Visualizations</h1>
-        <p class="hero-subtitle">
-          Master computer networking concepts with hands-on demos, step-by-step lessons,
-          and practice problems designed for CPSC 3600 at Clemson University.
+        <h1 id="page-title">CPSC 3600: Computer Networks</h1>
+        <div class="course-info">Clemson University | School of Computing</div>
+        <p class="course-description">
+          An introduction to computer networks with emphasis on the Internet architecture, protocols,
+          and network applications. Topics include application layer protocols, transport layer services,
+          network layer routing, link layer technologies, and network security fundamentals.
         </p>
       </div>
     </section>
 
-    <section class="course-overview">
+    <section class="course-modules" aria-labelledby="modules-heading">
       <div class="container">
-        <h2>Course Structure</h2>
-        <p class="intro-text">
-          This course is organized into six modules, each covering a key aspect of computer networks.
-          Work through lessons, explore interactive demos, and test your knowledge with practice problems.
-        </p>
+        <h2 id="modules-heading">Course Modules</h2>
 
-        <div id="modules-container" class="modules-grid">
+        <div id="modules-container" class="modules-list" role="list" aria-label="Course modules">
           <!-- Module cards will be dynamically inserted here -->
         </div>
       </div>
     </section>
 
-    <section class="features">
+    <section class="features" aria-labelledby="features-heading">
       <div class="container">
-        <h2>What You'll Learn</h2>
-        <div class="features-grid">
+        <h2 id="features-heading">What You'll Learn</h2>
+        <div class="features-grid" role="list">
           <div class="feature-item">
             <div class="feature-icon">🌐</div>
             <h3>Internet Architecture</h3>
@@ -75,10 +77,10 @@
       </div>
     </section>
 
-    <section class="learning-approach">
+    <section class="learning-approach" aria-labelledby="approach-heading">
       <div class="container">
-        <h2>Three Ways to Learn</h2>
-        <div class="approach-grid">
+        <h2 id="approach-heading">Three Ways to Learn</h2>
+        <div class="approach-grid" role="list">
           <div class="approach-card">
             <div class="approach-number">1</div>
             <h3>📚 Read Lessons</h3>
@@ -122,11 +124,14 @@
     </section>
   </main>
 
-  <footer class="site-footer">
+  <footer class="site-footer" role="contentinfo">
     <div class="container">
       <p>&copy; 2025 Clemson University - CPSC 3600</p>
       <p>
-        <a href="https://github.com/Clemson-CPSC-3600/clemson-cpsc-3600.github.io" target="_blank" rel="noopener">
+        <a href="https://github.com/Clemson-CPSC-3600/clemson-cpsc-3600.github.io"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="View source code on GitHub (opens in new tab)">
           View on GitHub
         </a>
       </p>
