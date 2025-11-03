@@ -2,7 +2,7 @@
   "name": "networking-visualizations",
   "version": "1.0.0",
   "type": "module",
-  "homepage": "https://clemson-cpsc-3600.github.io/networking-visualizations",
+  "homepage": "https://clemson-cpsc-3600.github.io",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

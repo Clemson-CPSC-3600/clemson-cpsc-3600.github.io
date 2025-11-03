@@ -31,7 +31,7 @@ function getHtmlEntries() {
 }
 
 export default defineConfig({
-  base: '/networking-visualizations/',  // Updated for networking-visualizations repo
+  base: '/',  // Root of the repository
   build: {
     rollupOptions: {
       input: getHtmlEntries()
