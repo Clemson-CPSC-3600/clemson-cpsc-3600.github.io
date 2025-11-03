@@ -5,8 +5,9 @@ import fs from 'fs';
 // Auto-discover all HTML files for multi-page build
 function getHtmlEntries() {
   const entries = {};
-  const excludeDirs = ['node_modules', 'dist', '.git', 'shared'];
-  
+  // Exclude old structure (demos, tutorials, examples) and infrastructure directories
+  const excludeDirs = ['node_modules', 'dist', '.git', 'shared', 'assets', 'demos', 'tutorials', 'examples'];
+
   function scanDir(dir, prefix = '') {
     const files = fs.readdirSync(dir);
     files.forEach(file => {
