@@ -1,0 +1,49 @@
+/**
+ * Module 5: Link Layer - Specific Styles
+ * Additional styles specific to Module 5 content
+ */
+
+/* Module 5 color override - Orange */
+.module-5 {
+  --color-module: #ea580c;
+}
+
+/* Any module-specific overrides or additions can go here */
+
+/* Example: Custom styling for Module 5 specific elements */
+.module-5 .module-header {
+  /* Module header already has gradient from module.css */
+  /* Additional Module 5-specific customizations can go here if needed */
+}
+
+/* Module 5 specific learning objective styling */
+.module-5 section[aria-labelledby="objectives-heading"] li,
+.module-5 section[aria-labelledby="topics-heading"] li {
+  position: relative;
+  padding-left: var(--space-6);
+}
+
+.module-5 section[aria-labelledby="objectives-heading"] li::before,
+.module-5 section[aria-labelledby="topics-heading"] li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--color-module);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Ensure proper spacing for module content sections */
+.module-5 .module-content {
+  margin-top: var(--space-8);
+}
+
+/* Responsive adjustments specific to Module 5 */
+@media (max-width: 768px) {
+  .module-5 .module-header h1 {
+    font-size: var(--font-size-4xl);
+  }
+
+  .module-5 .module-description {
+    font-size: var(--font-size-base);
+  }
+}

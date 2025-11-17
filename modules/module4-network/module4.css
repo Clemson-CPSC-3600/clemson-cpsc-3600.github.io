@@ -1,0 +1,49 @@
+/**
+ * Module 4: Network Layer - Specific Styles
+ * Additional styles specific to Module 4 content
+ */
+
+/* Module 4 color override - Red */
+.module-4 {
+  --color-module: #dc2626;
+}
+
+/* Any module-specific overrides or additions can go here */
+
+/* Example: Custom styling for Module 4 specific elements */
+.module-4 .module-header {
+  /* Module header already has gradient from module.css */
+  /* Additional Module 4-specific customizations can go here if needed */
+}
+
+/* Module 4 specific learning objective styling */
+.module-4 section[aria-labelledby="objectives-heading"] li,
+.module-4 section[aria-labelledby="topics-heading"] li {
+  position: relative;
+  padding-left: var(--space-6);
+}
+
+.module-4 section[aria-labelledby="objectives-heading"] li::before,
+.module-4 section[aria-labelledby="topics-heading"] li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--color-module);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Ensure proper spacing for module content sections */
+.module-4 .module-content {
+  margin-top: var(--space-8);
+}
+
+/* Responsive adjustments specific to Module 4 */
+@media (max-width: 768px) {
+  .module-4 .module-header h1 {
+    font-size: var(--font-size-4xl);
+  }
+
+  .module-4 .module-description {
+    font-size: var(--font-size-base);
+  }
+}

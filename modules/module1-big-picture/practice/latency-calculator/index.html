@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Practice solving network latency problems with immediate feedback">
+  <title>Latency Practice - Interactive Network Learning</title>
+  
+  <link rel="stylesheet" href="../../../../shared/styles/main.css">
+  <link rel="stylesheet" href="./styles/practice.css">
+  <link rel="stylesheet" href="./styles/packet-journey.css">
+</head>
+<body>
+  <!-- Skip to main content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Breadcrumb navigation -->
+  <nav aria-label="Breadcrumb" id="breadcrumb-container" style="padding: var(--space-4) var(--space-6);">
+    <!-- Breadcrumb will be inserted by JavaScript -->
+  </nav>
+
+  <main id="main-content">
+    <div class="demo-container">
+      <header class="demo-header">
+        <h1>🎯 Network Latency Practice</h1>
+        <p class="demo-description">
+          Practice calculating network latency by solving problems step-by-step.
+          Understand how transmission, propagation, processing, and queuing delays combine.
+        </p>
+      </header>
+      
+      <div class="demo-layout">
+        <!-- Control Panel (Left Sidebar) -->
+        <aside class="control-panel">
+          <h2>📚 Problem Selection</h2>
+          
+          <!-- Problem Selector -->
+          <div class="control-group">
+            <label for="problem-select" class="control-label">Choose Problem</label>
+            <select id="problem-select" class="control-select">
+              <option value="">-- Random Problem --</option>
+            </select>
+          </div>
+          
+          <!-- Statistics Panel -->
+          <div class="results-panel">
+            <h3>📊 Your Progress</h3>
+            <div class="result-item">
+              <label>Score:</label>
+              <span id="score" class="result-value">0</span>
+            </div>
+            <div class="result-item">
+              <label>Streak:</label>
+              <span id="streak" class="result-value">0</span>
+            </div>
+            <div class="result-item">
+              <label>Accuracy:</label>
+              <span id="accuracy" class="result-value">N/A</span>
+            </div>
+            <div class="result-item">
+              <label>Problems Solved:</label>
+              <span id="problems-solved" class="result-value">0</span>
+            </div>
+            <div class="result-item">
+              <label>Average Time:</label>
+              <span id="avg-time" class="result-value">N/A</span>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="control-buttons">
+            <button id="next-problem" class="btn btn-primary" style="display: none;">
+              Next Problem →
+            </button>
+            <button id="reset-stats" class="btn btn-secondary">
+              Reset Statistics
+            </button>
+          </div>
+          
+          <!-- Formula Reference -->
+          <div class="formula-panel">
+            <h3>📐 Quick Reference</h3>
+            <div class="formula-item">
+              <div class="formula-label">Transmission</div>
+              <div class="formula-value">Packet Size ÷ Bandwidth</div>
+            </div>
+            <div class="formula-item">
+              <div class="formula-label">Propagation</div>
+              <div class="formula-value">Distance ÷ Speed</div>
+              <div class="formula-note">
+                Fiber/Copper: 2×10⁸ m/s<br>
+                Wireless: 3×10⁸ m/s
+              </div>
+            </div>
+            <div class="formula-item">
+              <div class="formula-label">Processing</div>
+              <div class="formula-note">Device-specific (given)</div>
+            </div>
+            <div class="formula-item">
+              <div class="formula-label">Queuing</div>
+              <div class="formula-value">(1/(1-ρ)³ - 1) ms</div>
+              <div class="formula-note">ρ = utilization</div>
+            </div>
+          </div>
+        </aside>
+        
+        <!-- Main Content Area -->
+        <section class="main-content">
+          <!-- Problem Display -->
+          <div id="problem-display" class="problem-container">
+            <div class="welcome-message">
+              <h2>Welcome to Latency Practice!</h2>
+              <p>Select a problem from the sidebar or let us choose one for you.</p>
+              <p>This version features:</p>
+              <ul>
+                <li>✅ Interactive network visualization</li>
+                <li>✅ Hover over elements for details</li>
+                <li>✅ Step-by-step problem solving</li>
+                <li>✅ Immediate feedback</li>
+              </ul>
+              <button class="btn btn-primary" onclick="document.getElementById('next-problem').click()">
+                Start Practice
+              </button>
+            </div>
+          </div>
+          
+          <!-- Network Visualization -->
+          <div class="canvas-container">
+            <canvas id="network-canvas"></canvas>
+            <div class="canvas-caption">
+              Hover over network elements to see their properties. Click to select.
+            </div>
+          </div>
+          
+          <!-- Answer Input Area -->
+          <div id="answer-area" class="answer-container" style="display: none;">
+            <!-- Will be populated dynamically based on problem type -->
+          </div>
+          
+          <!-- Control Buttons -->
+          <div class="action-buttons">
+            <button id="check-answer" class="btn btn-primary">
+              Check Answer
+            </button>
+            <button id="get-hint" class="btn btn-secondary">
+              Get Hint
+            </button>
+            <button id="show-solution" class="btn btn-secondary">
+              Show Solution
+            </button>
+          </div>
+          
+          <!-- Feedback Area -->
+          <div id="feedback-area" class="feedback-container" style="display: none;">
+            <div id="feedback-content"></div>
+          </div>
+          
+          <!-- Hint Container -->
+          <div id="hint-container" class="hint-container" style="display: none;">
+            <h4>💡 Hint</h4>
+            <div id="hint-content"></div>
+          </div>
+          
+          <!-- Delay Breakdown Visualization -->
+          <div id="breakdown-chart" class="breakdown-chart" style="display: none;">
+            <h3>Delay Component Analysis</h3>
+            <div class="breakdown-bars">
+              <!-- Will be populated with delay component bars -->
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Shared components -->
+  <script type="module" src="../../../../shared/components/Breadcrumb.js"></script>
+
+  <!-- Initialize breadcrumb -->
+  <script type="module">
+    import { Breadcrumb } from '../../../../shared/components/Breadcrumb.js';
+
+    const breadcrumbContainer = document.getElementById('breadcrumb-container');
+    if (breadcrumbContainer) {
+      const breadcrumb = Breadcrumb.createCustom([
+        { label: 'Home', href: '../../../../index.html' },
+        { label: 'Module 1: The Big Picture', href: '../../index.html' },
+        { label: 'Latency Calculator Practice', href: null }
+      ]);
+      breadcrumbContainer.appendChild(breadcrumb);
+    }
+  </script>
+
+  <!-- Load refactored version -->
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

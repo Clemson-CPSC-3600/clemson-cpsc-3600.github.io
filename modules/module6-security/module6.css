@@ -1,0 +1,49 @@
+/**
+ * Module 6: Network Security - Specific Styles
+ * Additional styles specific to Module 6 content
+ */
+
+/* Module 6 color override - Dark Slate */
+.module-6 {
+  --color-module: #1e293b;
+}
+
+/* Any module-specific overrides or additions can go here */
+
+/* Example: Custom styling for Module 6 specific elements */
+.module-6 .module-header {
+  /* Module header already has gradient from module.css */
+  /* Additional Module 6-specific customizations can go here if needed */
+}
+
+/* Module 6 specific learning objective styling */
+.module-6 section[aria-labelledby="objectives-heading"] li,
+.module-6 section[aria-labelledby="topics-heading"] li {
+  position: relative;
+  padding-left: var(--space-6);
+}
+
+.module-6 section[aria-labelledby="objectives-heading"] li::before,
+.module-6 section[aria-labelledby="topics-heading"] li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--color-module);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Ensure proper spacing for module content sections */
+.module-6 .module-content {
+  margin-top: var(--space-8);
+}
+
+/* Responsive adjustments specific to Module 6 */
+@media (max-width: 768px) {
+  .module-6 .module-header h1 {
+    font-size: var(--font-size-4xl);
+  }
+
+  .module-6 .module-description {
+    font-size: var(--font-size-base);
+  }
+}

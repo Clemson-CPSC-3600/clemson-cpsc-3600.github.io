@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive ladder diagram visualization showing packet flow through a network">
+  <title>Ladder Diagram - Network Latency Visualization</title>
+  
+  <link rel="stylesheet" href="../../../../shared/styles/main.css">
+  <link rel="stylesheet" href="./styles/ladder.css">
+</head>
+<body>
+  <!-- Skip to main content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Breadcrumb navigation -->
+  <nav aria-label="Breadcrumb" id="breadcrumb-container" style="padding: var(--space-4) var(--space-6);">
+    <!-- Breadcrumb will be inserted by JavaScript -->
+  </nav>
+
+  <main id="main-content">
+    <div class="ladder-container">
+      <header class="ladder-header">
+        <h1>Network Ladder Diagram</h1>
+        <p class="subtitle">Visualize packet flow through time and space</p>
+      </header>
+      
+      <div class="ladder-layout">
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+          <div class="control-section">
+            <h3>Playback Controls</h3>
+            <div class="playback-controls">
+              <button id="play-pause" class="btn btn-primary">
+                <span class="play-icon">▶</span>
+                <span class="pause-icon" style="display: none;">⏸</span>
+              </button>
+              <button id="step-backward" class="btn btn-secondary">⏮</button>
+              <button id="step-forward" class="btn btn-secondary">⏭</button>
+              <button id="reset" class="btn btn-secondary">⏹</button>
+            </div>
+            
+            <div class="speed-control">
+              <label for="speed-slider">Speed:</label>
+              <input type="range" id="speed-slider" min="0.05" max="2" step="0.05" value="0.25">
+              <span id="speed-display">0.25x</span>
+            </div>
+            
+            <div class="time-display">
+              <label>Current Time:</label>
+              <span id="current-time">0.00 ms</span>
+            </div>
+          </div>
+          
+          <div class="control-section">
+            <h3>Scenario</h3>
+            <select id="scenario-select" class="scenario-dropdown">
+              <option value="simple">Simple 2-Hop Network</option>
+              <option value="lan">Local Area Network</option>
+              <option value="wan">Wide Area Network</option>
+              <option value="congested">Congested Network</option>
+              <option value="balanced">Balanced Delays (Equal Components)</option>
+              <option value="transcontinental">Transcontinental Cable (NYC-London)</option>
+              <option value="satellite">Satellite Internet (Geostationary)</option>
+            </select>
+          </div>
+          
+          <div class="control-section">
+            <h3>Packet Mode</h3>
+            <div class="packet-mode-toggle">
+              <label class="toggle-label">
+                <input type="checkbox" id="multi-packet-mode">
+                <span>Multiple Packets</span>
+              </label>
+            </div>
+            
+            <div id="multi-packet-controls" style="display: none;">
+              <div class="packet-send-mode">
+                <label for="send-mode">Send Mode:</label>
+                <select id="send-mode" class="mode-dropdown">
+                  <option value="interval">Interval</option>
+                  <option value="burst">Burst</option>
+                  <option value="manual">Manual</option>
+                </select>
+              </div>
+              
+              <div class="packet-interval-control">
+                <label for="packet-interval">Interval (ms):</label>
+                <input type="number" id="packet-interval" min="1" max="100" value="10">
+              </div>
+              
+              <div class="burst-size-control" style="display: none;">
+                <label for="burst-size">Burst Size:</label>
+                <input type="number" id="burst-size" min="2" max="10" value="3">
+              </div>
+              
+              <button id="send-packet-btn" class="btn btn-secondary" style="display: none; width: 100%; margin-top: 0.5rem;">
+                Send Packet
+              </button>
+              
+              <div class="packets-info">
+                <div class="info-item">
+                  <label>Packets Sent:</label>
+                  <span id="packets-sent">0</span>
+                </div>
+                <div class="info-item">
+                  <label>Packets Delivered:</label>
+                  <span id="packets-delivered">0</span>
+                </div>
+                <div class="info-item">
+                  <label>In Transit:</label>
+                  <span id="packets-transit">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="control-section">
+            <h3>Packet Info</h3>
+            <div class="info-display">
+              <div class="info-item">
+                <label>Size:</label>
+                <span id="packet-size">1500 bytes</span>
+              </div>
+              <div class="info-item">
+                <label>Location:</label>
+                <span id="packet-location">Source</span>
+              </div>
+              <div class="info-item">
+                <label>Current Delay:</label>
+                <span id="current-delay">-</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="control-section">
+            <h3>Delay Components</h3>
+            <div class="delay-totals">
+              <div class="delay-item transmission">
+                <span class="delay-color"></span>
+                <label>Transmission:</label>
+                <span id="transmission-total">0.00 ms</span>
+              </div>
+              <div class="delay-item propagation">
+                <span class="delay-color"></span>
+                <label>Propagation:</label>
+                <span id="propagation-total">0.00 ms</span>
+              </div>
+              <div class="delay-item processing">
+                <span class="delay-color"></span>
+                <label>Processing:</label>
+                <span id="processing-total">0.00 ms</span>
+              </div>
+              <div class="delay-item queuing">
+                <span class="delay-color"></span>
+                <label>Queuing:</label>
+                <span id="queuing-total">0.00 ms</span>
+              </div>
+              <div class="delay-item total">
+                <label>Total:</label>
+                <span id="total-delay">0.00 ms</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="control-section">
+            <h3>Legend</h3>
+            <div class="legend">
+              <div class="legend-item">
+                <span class="legend-line transmission"></span>
+                <span>Transmission</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-line propagation"></span>
+                <span>Propagation</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-box processing"></span>
+                <span>Processing</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-box queuing"></span>
+                <span>Queuing</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Main Visualization -->
+        <div class="visualization-area">
+          <div id="ladder-diagram" class="ladder-diagram">
+            <svg id="ladder-svg" width="100%" height="100%" viewBox="0 0 800 600">
+              <!-- SVG content will be generated by JavaScript -->
+            </svg>
+          </div>
+          
+          <div class="timeline-controls">
+            <input type="range" id="timeline-slider" class="timeline-slider" min="0" max="100" value="0">
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Shared components -->
+  <script type="module" src="../../../../shared/components/Breadcrumb.js"></script>
+
+  <!-- Initialize breadcrumb -->
+  <script type="module">
+    import { Breadcrumb } from '../../../../shared/components/Breadcrumb.js';
+
+    const breadcrumbContainer = document.getElementById('breadcrumb-container');
+    if (breadcrumbContainer) {
+      const breadcrumb = Breadcrumb.createCustom([
+        { label: 'Home', href: '../../../../index.html' },
+        { label: 'Module 1: The Big Picture', href: '../../index.html' },
+        { label: 'Ladder Diagram Demo', href: null }
+      ]);
+      breadcrumbContainer.appendChild(breadcrumb);
+    }
+  </script>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

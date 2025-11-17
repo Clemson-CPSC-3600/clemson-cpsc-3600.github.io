@@ -1,0 +1,49 @@
+/**
+ * Module 3: Transport Layer - Specific Styles
+ * Additional styles specific to Module 3 content
+ */
+
+/* Module 3 color override - Purple */
+.module-3 {
+  --color-module: #7c3aed;
+}
+
+/* Any module-specific overrides or additions can go here */
+
+/* Example: Custom styling for Module 3 specific elements */
+.module-3 .module-header {
+  /* Module header already has gradient from module.css */
+  /* Additional Module 3-specific customizations can go here if needed */
+}
+
+/* Module 3 specific learning objective styling */
+.module-3 section[aria-labelledby="objectives-heading"] li,
+.module-3 section[aria-labelledby="topics-heading"] li {
+  position: relative;
+  padding-left: var(--space-6);
+}
+
+.module-3 section[aria-labelledby="objectives-heading"] li::before,
+.module-3 section[aria-labelledby="topics-heading"] li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--color-module);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Ensure proper spacing for module content sections */
+.module-3 .module-content {
+  margin-top: var(--space-8);
+}
+
+/* Responsive adjustments specific to Module 3 */
+@media (max-width: 768px) {
+  .module-3 .module-header h1 {
+    font-size: var(--font-size-4xl);
+  }
+
+  .module-3 .module-description {
+    font-size: var(--font-size-base);
+  }
+}

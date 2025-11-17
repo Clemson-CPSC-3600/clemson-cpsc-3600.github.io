@@ -1,0 +1,49 @@
+/**
+ * Module 2: Application Layer - Specific Styles
+ * Additional styles specific to Module 2 content
+ */
+
+/* Module 2 color override - Emerald Green */
+.module-2 {
+  --color-module: #059669;
+}
+
+/* Any module-specific overrides or additions can go here */
+
+/* Example: Custom styling for Module 2 specific elements */
+.module-2 .module-header {
+  /* Module header already has gradient from module.css */
+  /* Additional Module 2-specific customizations can go here if needed */
+}
+
+/* Module 2 specific learning objective styling */
+.module-2 section[aria-labelledby="objectives-heading"] li,
+.module-2 section[aria-labelledby="topics-heading"] li {
+  position: relative;
+  padding-left: var(--space-6);
+}
+
+.module-2 section[aria-labelledby="objectives-heading"] li::before,
+.module-2 section[aria-labelledby="topics-heading"] li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--color-module);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Ensure proper spacing for module content sections */
+.module-2 .module-content {
+  margin-top: var(--space-8);
+}
+
+/* Responsive adjustments specific to Module 2 */
+@media (max-width: 768px) {
+  .module-2 .module-header h1 {
+    font-size: var(--font-size-4xl);
+  }
+
+  .module-2 .module-description {
+    font-size: var(--font-size-base);
+  }
+}

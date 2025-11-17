@@ -1,0 +1,49 @@
+/**
+ * Module 1: The Big Picture - Specific Styles
+ * Additional styles specific to Module 1 content
+ */
+
+/* Module 1 color override - Deep Blue */
+.module-1 {
+  --color-module: #2563eb;
+}
+
+/* Any module-specific overrides or additions can go here */
+
+/* Example: Custom styling for Module 1 specific elements */
+.module-1 .module-header {
+  /* Module header already has gradient from module.css */
+  /* Additional Module 1-specific customizations can go here if needed */
+}
+
+/* Module 1 specific learning objective styling */
+.module-1 section[aria-labelledby="objectives-heading"] li,
+.module-1 section[aria-labelledby="topics-heading"] li {
+  position: relative;
+  padding-left: var(--space-6);
+}
+
+.module-1 section[aria-labelledby="objectives-heading"] li::before,
+.module-1 section[aria-labelledby="topics-heading"] li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--color-module);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Ensure proper spacing for module content sections */
+.module-1 .module-content {
+  margin-top: var(--space-8);
+}
+
+/* Responsive adjustments specific to Module 1 */
+@media (max-width: 768px) {
+  .module-1 .module-header h1 {
+    font-size: var(--font-size-4xl);
+  }
+
+  .module-1 .module-description {
+    font-size: var(--font-size-base);
+  }
+}

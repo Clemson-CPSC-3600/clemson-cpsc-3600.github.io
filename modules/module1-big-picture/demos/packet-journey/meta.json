@@ -1,0 +1,25 @@
+{
+  "title": "Packet Journey - Network Latency Visualization",
+  "description": "Interactive visualization showing how all four latency components (transmission, propagation, processing, and queuing) accumulate at each hop in a network path",
+  "keywords": ["latency", "networking", "packet", "delay", "transmission", "propagation", "processing", "queuing"],
+  "difficulty": "intermediate",
+  "prerequisites": ["basic-networking", "network-layers"],
+  "estimatedTime": "15 minutes",
+  "category": "network-performance",
+  "order": 1,
+  "features": [
+    "Complete latency modeling with all four components",
+    "Multiple network presets (home, gaming, satellite, enterprise)",
+    "Interactive packet size adjustment",
+    "Hop-by-hop breakdown visualization",
+    "Bottleneck identification",
+    "Application suitability analysis"
+  ],
+  "learningObjectives": [
+    "Understand the four components of network latency",
+    "See how latency accumulates across network hops",
+    "Identify bottlenecks in network paths",
+    "Learn how different network types affect latency",
+    "Understand the relationship between packet size and transmission delay"
+  ]
+}
