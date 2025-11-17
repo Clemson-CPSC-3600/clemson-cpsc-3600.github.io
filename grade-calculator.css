@@ -1,0 +1,542 @@
+/**
+ * Grade Calculator Styles
+ * Additional styles specific to the grade calculator page
+ */
+
+/* Page Header */
+.page-header {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: white;
+  padding: var(--space-12) 0;
+  text-align: center;
+}
+
+.page-header h1 {
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-3);
+}
+
+.page-description {
+  font-size: var(--font-size-lg);
+  opacity: 0.95;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Grade Summary Cards */
+.grade-summary {
+  margin: var(--space-12) 0;
+}
+
+.grade-summary h2 {
+  text-align: center;
+  margin-bottom: var(--space-8);
+  font-size: var(--font-size-3xl);
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+  justify-items: center;
+}
+
+.summary-card {
+  background: white;
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-10);
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  min-width: 300px;
+}
+
+.summary-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.summary-value {
+  font-size: 5rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin: var(--space-4) 0;
+  line-height: 1;
+}
+
+.summary-subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-light);
+  margin-top: var(--space-3);
+}
+
+.grade-letter {
+  font-family: Georgia, serif;
+}
+
+.grade-letter.grade-a {
+  color: #059669;
+}
+
+.grade-letter.grade-b {
+  color: #2563eb;
+}
+
+.grade-letter.grade-c {
+  color: #ea580c;
+}
+
+.grade-letter.grade-d {
+  color: #dc2626;
+}
+
+.grade-letter.grade-f {
+  color: var(--color-text-light);
+}
+
+/* Grade Thresholds */
+.grade-thresholds {
+  margin: var(--space-12) 0;
+}
+
+.grade-thresholds h2 {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.threshold-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-4);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.threshold-item {
+  border-radius: var(--border-radius-md);
+  padding: var(--space-6);
+  text-align: center;
+  border: 2px solid;
+}
+
+.threshold-a {
+  background-color: #f0fdf4;
+  border-color: #059669;
+}
+
+.threshold-b {
+  background-color: #eff6ff;
+  border-color: #2563eb;
+}
+
+.threshold-c {
+  background-color: #fff7ed;
+  border-color: #ea580c;
+}
+
+.threshold-d {
+  background-color: #fef2f2;
+  border-color: #dc2626;
+}
+
+.threshold-grade {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  font-family: Georgia, serif;
+  margin-bottom: var(--space-2);
+}
+
+.threshold-points {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Input Sections */
+.calculator-sections {
+  margin: var(--space-12) 0;
+}
+
+.input-section {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+
+.input-section h2 {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.section-icon {
+  font-size: var(--font-size-3xl);
+}
+
+.section-description {
+  color: var(--color-text-light);
+  margin-bottom: var(--space-6);
+  font-size: var(--font-size-base);
+}
+
+.section-total {
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 2px solid var(--color-border);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  text-align: right;
+}
+
+/* Assignment Cards */
+.assignment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.assignment-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-6);
+  background: var(--color-bg-secondary);
+}
+
+.assignment-card h3 {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-4);
+  color: var(--color-text);
+}
+
+.bundle-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  padding: var(--space-2);
+  border-radius: var(--border-radius-sm);
+  transition: background-color 0.2s;
+}
+
+.checkbox-label:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.checkbox-label span {
+  font-size: var(--font-size-base);
+}
+
+.assignment-total {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  font-weight: var(--font-weight-semibold);
+  text-align: right;
+  font-size: var(--font-size-base);
+}
+
+/* Individual Points Input Groups */
+.individual-points-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 500px;
+}
+
+.points-input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.points-input-row label {
+  font-weight: var(--font-weight-medium);
+  min-width: 140px;
+}
+
+.points-input-row .number-input {
+  width: 80px;
+}
+
+.max-points {
+  color: var(--color-text-light);
+  font-size: var(--font-size-sm);
+}
+
+/* Network Assignments */
+.network-assignments {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 500px;
+}
+
+/* Exit Checks */
+.exit-inputs {
+  max-width: 500px;
+}
+
+.input-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+  gap: var(--space-4);
+}
+
+.input-group label {
+  font-weight: var(--font-weight-medium);
+  flex: 1;
+}
+
+.number-input {
+  width: 100px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-base);
+  text-align: center;
+}
+
+.number-input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-color: var(--color-primary);
+}
+
+.exit-calculation {
+  background: var(--color-bg-secondary);
+  padding: var(--space-4);
+  border-radius: var(--border-radius-md);
+  margin-top: var(--space-4);
+  font-size: var(--font-size-base);
+}
+
+.exit-calculation p {
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* Scenarios Section */
+.scenarios-section {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-8);
+  margin: var(--space-12) 0;
+}
+
+.scenarios-section h2 {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-4);
+}
+
+.scenarios-section > p {
+  color: var(--color-text-light);
+  margin-bottom: var(--space-6);
+}
+
+.target-selector {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-6);
+}
+
+.target-btn {
+  flex: 1;
+  min-width: 150px;
+  padding: var(--space-4) var(--space-6);
+  border: 2px solid var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.target-btn:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+.target-btn:active {
+  transform: translateY(0);
+}
+
+.scenario-result {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-6);
+  margin-top: var(--space-6);
+}
+
+.scenario-result h3 {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-4);
+  color: var(--color-primary);
+}
+
+.scenario-result p {
+  margin-bottom: var(--space-3);
+  line-height: 1.6;
+}
+
+.scenario-result ul {
+  margin-left: var(--space-6);
+  margin-top: var(--space-2);
+}
+
+.scenario-result li {
+  margin-bottom: var(--space-2);
+}
+
+.scenario-success {
+  color: #059669;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-lg);
+}
+
+/* Information Section */
+.info-section {
+  margin: var(--space-12) 0;
+}
+
+.info-section h2 {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-6);
+  text-align: center;
+}
+
+.info-accordion {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--space-4);
+  overflow: hidden;
+}
+
+.info-accordion summary {
+  padding: var(--space-5);
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-lg);
+  background: var(--color-bg-secondary);
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.info-accordion summary:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.info-accordion[open] summary {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.accordion-content {
+  padding: var(--space-6);
+}
+
+.accordion-content h4 {
+  font-size: var(--font-size-lg);
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.accordion-content h4:first-child {
+  margin-top: 0;
+}
+
+.accordion-content p {
+  margin-bottom: var(--space-3);
+  line-height: 1.6;
+}
+
+.accordion-content ul {
+  margin-left: var(--space-6);
+  margin-bottom: var(--space-4);
+}
+
+.accordion-content li {
+  margin-bottom: var(--space-2);
+  line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: var(--font-size-4xl);
+  }
+
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-value {
+    font-size: var(--font-size-5xl);
+  }
+
+  .threshold-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .assignment-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .target-selector {
+    flex-direction: column;
+  }
+
+  .target-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    padding: var(--space-8) 0;
+  }
+
+  .page-header h1 {
+    font-size: var(--font-size-3xl);
+  }
+
+  .input-section {
+    padding: var(--space-6);
+  }
+
+  .section-icon {
+    font-size: var(--font-size-2xl);
+  }
+
+  .threshold-grid {
+    grid-template-columns: 1fr;
+  }
+}

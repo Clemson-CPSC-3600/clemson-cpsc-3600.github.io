@@ -13,19 +13,26 @@ function getHtmlEntries() {
     files.forEach(file => {
       // Skip excluded directories
       if (excludeDirs.includes(file)) return;
-      
+
       const path = `${dir}/${file}`;
       const key = prefix ? `${prefix}/${file}` : file;
-      
+
       if (fs.statSync(path).isDirectory()) {
         scanDir(path, key);
       } else if (file === 'index.html') {
         const entryName = prefix || 'main';
         entries[entryName] = resolve(__dirname, path);
+      } else if (file === '404.html') {
+        // Include 404 page for GitHub Pages
+        entries['404'] = resolve(__dirname, path);
+      } else if (file.endsWith('.html') && !prefix) {
+        // Include standalone HTML files at root level (e.g., grade-calculator.html)
+        const entryName = file.replace('.html', '');
+        entries[entryName] = resolve(__dirname, path);
       }
     });
   }
-  
+
   scanDir('.');
   console.log('Found entries:', entries);
   return entries;

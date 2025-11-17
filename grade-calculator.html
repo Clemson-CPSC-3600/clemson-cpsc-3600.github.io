@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Grade Calculator for CPSC 3600 - Calculate your current grade and plan your path to success">
+  <title>Grade Calculator | CPSC 3600</title>
+
+  <link rel="stylesheet" href="./shared/styles/main.css">
+  <link rel="stylesheet" href="./grade-calculator.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="page-header" role="banner">
+    <div class="container">
+      <h1>Grade Calculator</h1>
+      <p class="page-description">
+        Calculate your current grade and understand what you need to achieve your target letter grade.
+      </p>
+    </div>
+  </header>
+
+  <main id="main-content" class="container" role="main">
+    <nav aria-label="Breadcrumb" class="breadcrumb" style="margin-bottom: var(--space-8);">
+      <a href="./index.html">Home</a> / <span>Grade Calculator</span>
+    </nav>
+
+    <!-- Input Sections -->
+    <div class="calculator-sections">
+
+      <!-- Projects Section -->
+      <section class="input-section" aria-labelledby="projects-heading">
+        <h2 id="projects-heading">
+          <span class="section-icon" aria-hidden="true">💻</span>
+          Projects
+        </h2>
+        <p class="section-description">
+          Enter points earned for each project (0-3 points each).
+        </p>
+        <div class="individual-points-group">
+          <div class="points-input-row">
+            <label for="project1-points">Project 1:</label>
+            <input type="number" id="project1-points" min="0" max="3" value="0" class="number-input">
+            <span class="max-points">/ 3 points</span>
+          </div>
+          <div class="points-input-row">
+            <label for="project2-points">Project 2:</label>
+            <input type="number" id="project2-points" min="0" max="3" value="0" class="number-input">
+            <span class="max-points">/ 3 points</span>
+          </div>
+          <div class="points-input-row">
+            <label for="project3-points">Project 3:</label>
+            <input type="number" id="project3-points" min="0" max="3" value="0" class="number-input">
+            <span class="max-points">/ 3 points</span>
+          </div>
+        </div>
+        <div class="section-total">Total Project Points: <span id="projects-total">0</span>/9</div>
+      </section>
+
+      <!-- Exams Section -->
+      <section class="input-section" aria-labelledby="exams-heading">
+        <h2 id="exams-heading">
+          <span class="section-icon" aria-hidden="true">📝</span>
+          Exams
+        </h2>
+        <p class="section-description">
+          Enter points earned for each exam (0-3 points each).
+        </p>
+        <div class="individual-points-group">
+          <div class="points-input-row">
+            <label for="exam1-points">Exam 1:</label>
+            <input type="number" id="exam1-points" min="0" max="3" value="0" class="number-input">
+            <span class="max-points">/ 3 points</span>
+          </div>
+          <div class="points-input-row">
+            <label for="exam2-points">Exam 2:</label>
+            <input type="number" id="exam2-points" min="0" max="3" value="0" class="number-input">
+            <span class="max-points">/ 3 points</span>
+          </div>
+          <div class="points-input-row">
+            <label for="exam3-points">Exam 3 (Final):</label>
+            <input type="number" id="exam3-points" min="0" max="3" value="0" class="number-input">
+            <span class="max-points">/ 3 points</span>
+          </div>
+        </div>
+        <div class="section-total">Total Exam Points: <span id="exams-total">0</span>/9</div>
+      </section>
+
+      <!-- Network Analysis Section -->
+      <section class="input-section" aria-labelledby="network-heading">
+        <h2 id="network-heading">
+          <span class="section-icon" aria-hidden="true">📊</span>
+          Network Analysis Assignments
+        </h2>
+        <p class="section-description">
+          Each assignment is worth 1 point (Satisfactory/Unsatisfactory).
+        </p>
+        <div class="network-assignments">
+          <label class="checkbox-label">
+            <input type="checkbox" id="na1" class="network-checkbox">
+            <span>Network Analysis 1 (1 pt)</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="na2" class="network-checkbox">
+            <span>Network Analysis 2 (1 pt)</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="na3" class="network-checkbox">
+            <span>Network Analysis 3 (1 pt)</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="na4" class="network-checkbox">
+            <span>Network Analysis 4 (1 pt)</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="na5" class="network-checkbox">
+            <span>Network Analysis 5 (1 pt)</span>
+          </label>
+        </div>
+        <div class="section-total">Total Network Analysis Points: <span id="network-total">0</span>/5</div>
+      </section>
+
+      <!-- Exit Checks Section -->
+      <section class="input-section" aria-labelledby="exit-heading">
+        <h2 id="exit-heading">
+          <span class="section-icon" aria-hidden="true">✓</span>
+          Exit Checks
+        </h2>
+        <p class="section-description">
+          Worth 2 points total based on completion percentage. You may drop 3 exit checks without penalty.
+        </p>
+        <div class="exit-inputs">
+          <div class="input-group">
+            <label for="exit-completed">Exit Checks Completed:</label>
+            <input type="number" id="exit-completed" min="0" max="99" value="0" class="number-input">
+          </div>
+          <div class="input-group">
+            <label for="exit-offered">Exit Checks Offered:</label>
+            <input type="number" id="exit-offered" min="0" max="99" value="0" class="number-input">
+          </div>
+          <div class="exit-calculation">
+            <p>
+              With 3 drops: <strong id="exit-graded-count">0</strong> graded checks<br>
+              Completion: <strong id="exit-percentage">0%</strong><br>
+              Points earned: <strong id="exit-points-final">0</strong>
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Current Grade Summary -->
+    <section class="grade-summary" aria-labelledby="summary-heading">
+      <h2 id="summary-heading">Total Points Earned So Far</h2>
+      <div class="summary-cards">
+        <div class="summary-card">
+          <div class="summary-value" id="total-points">0</div>
+          <div class="summary-subtitle">out of 25 possible</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- What-If Scenarios -->
+    <section class="scenarios-section" aria-labelledby="scenarios-heading">
+      <h2 id="scenarios-heading">Plan Your Path to Success</h2>
+      <p>Select a target grade to see what you need to achieve it:</p>
+
+      <div class="target-selector">
+        <button class="target-btn" data-target="A">Target: A (23 / 25 pts)</button>
+        <button class="target-btn" data-target="B">Target: B (20 / 25 pts)</button>
+        <button class="target-btn" data-target="C">Target: C (17 / 25 pts)</button>
+        <button class="target-btn" data-target="D">Target: D (14 / 25 pts)</button>
+      </div>
+
+      <div class="scenario-result" id="scenario-result" style="display: none;">
+        <h3 id="scenario-title">Path to Grade A</h3>
+        <p id="scenario-message"></p>
+      </div>
+    </section>
+
+    <!-- Information Accordion -->
+    <section class="info-section" aria-labelledby="info-heading">
+      <h2 id="info-heading">About Specification Grading</h2>
+
+      <details class="info-accordion">
+        <summary>Understanding the Bundle System</summary>
+        <div class="accordion-content">
+          <h4>Project Bundles</h4>
+          <p>Project bundles must be completed <strong>sequentially</strong>—you cannot earn credit for Bundle 2 without first completing Bundle 1.</p>
+          <ul>
+            <li><strong>Bundle 1:</strong> Core functionality and basic test cases</li>
+            <li><strong>Bundle 2:</strong> Intermediate features and edge case handling</li>
+            <li><strong>Bundle 3:</strong> Advanced features and comprehensive testing</li>
+          </ul>
+
+          <h4>Exam Bundles</h4>
+          <p>Exam bundles are graded <strong>independently</strong>. Roughly 80% mastery = Satisfactory.</p>
+          <ul>
+            <li><strong>Bundle 1:</strong> Multiple choice and short answer (foundational knowledge)</li>
+            <li><strong>Bundle 2:</strong> Problem-solving questions (application)</li>
+            <li><strong>Bundle 3:</strong> Code comprehension (current project concepts)</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="info-accordion">
+        <summary>Resubmission Policies</summary>
+        <div class="accordion-content">
+          <ul>
+            <li><strong>Projects:</strong> 24-hour late window (no penalty) + 3-day resubmission window for Unsatisfactory bundles</li>
+            <li><strong>Exams:</strong> Retake Unsatisfactory bundles from Exams 1-2 during the final exam period</li>
+            <li><strong>Network Analysis:</strong> 24-hour late window + 3-day resubmission window after grades released</li>
+            <li><strong>Exit Checks:</strong> Cannot be resubmitted, but 3 automatic drops allowed</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="info-accordion">
+        <summary>Example Scenarios</summary>
+        <div class="accordion-content">
+          <ul>
+            <li><strong>D Grade (14 pts):</strong> All Project Bundle 1s (3 pts) + Exam 1-2 Bundles 1-2 (4 pts) + Exam 3 Bundle 1 (1 pt) + All Network Analysis (5 pts) + 1 Exit Check point</li>
+            <li><strong>C Grade (17 pts):</strong> Two complete Projects (6 pts) + All Exam Bundle 1s (3 pts) + Two Exam Bundle 2s (2 pts) + 4 Network Analysis (4 pts) + 2 Exit Check points</li>
+            <li><strong>B Grade (20 pts):</strong> Two complete Projects (6 pts) + Two complete Exams (6 pts) + Exam 3 Bundle 1 (1 pt) + All Network Analysis (5 pts) + 2 Exit Check points</li>
+            <li><strong>A Grade (23 pts):</strong> All Projects (9 pts) + Two complete Exams (6 pts) + Exam 3 Bundles 1-2 (2 pts) + 4 Network Analysis (4 pts) + 2 Exit Check points</li>
+          </ul>
+        </div>
+      </details>
+    </section>
+
+    <!-- Reset Button -->
+    <div style="text-align: center; margin-top: var(--space-12);">
+      <button id="reset-btn" class="btn btn-secondary">Reset All Inputs</button>
+    </div>
+
+  </main>
+
+  <footer role="contentinfo" style="margin-top: var(--space-20); padding: var(--space-8) 0; border-top: 1px solid var(--color-border); text-align: center;">
+    <div class="container">
+      <p style="color: var(--color-text-light); font-size: var(--font-size-sm);">
+        CPSC 3600: Computer Networks | Clemson University
+      </p>
+    </div>
+  </footer>
+
+  <script type="module" src="./grade-calculator.js"></script>
+</body>
+</html>
