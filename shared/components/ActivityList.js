@@ -29,47 +29,102 @@ export class ActivityList {
 
   /**
    * Create a single activity list item
-   * @param {Object} activity - Activity object
-   * @param {string} type - Activity type
-   * @param {string} basePath - Base path for link
+   * Supports both object-based API and positional arguments
+   * @param {Object} activityOrConfig - Activity object or config object with {title, url, estimatedTime, isCompleted, status, onClick}
+   * @param {string} [type] - Activity type (optional if using config object)
+   * @param {string} [basePath] - Base path for link (optional if using config object)
    * @param {ProgressTracker} [progressTracker] - Optional progress tracker
    * @returns {HTMLElement} List item element
    */
-  static createItem(activity, type, basePath, progressTracker = null) {
+  static createItem(activityOrConfig, type, basePath, progressTracker = null) {
     const item = document.createElement('li');
-    item.setAttribute('data-activity-id', activity.id);
 
-    // Create link
-    const link = document.createElement('a');
-    link.href = `${basePath}${type}/${activity.id}/`;
-    link.textContent = activity.title;
+    // Check if using new config-based API (has 'url' property) or old positional API
+    const isConfigAPI = activityOrConfig && typeof activityOrConfig.url === 'string';
 
-    // Add time estimate
-    const timeEstimate = document.createElement('span');
-    timeEstimate.className = 'time-estimate';
-    timeEstimate.textContent = activity.estimatedTime;
+    let link, timeEstimate, statusBadge, isCompleted, onClick;
 
-    // Add status badge if available
-    if (activity.status) {
-      const statusBadge = document.createElement('span');
-      statusBadge.className = `activity-status ${activity.status}`;
-      statusBadge.textContent = activity.status;
-      item.appendChild(statusBadge);
+    if (isConfigAPI) {
+      // New config-based API used by module landing pages
+      const config = activityOrConfig;
+
+      // Create link
+      link = document.createElement('a');
+      link.href = config.url;
+      link.textContent = config.title;
+      link.className = 'activity-link';
+
+      // Add time estimate
+      if (config.estimatedTime) {
+        timeEstimate = document.createElement('span');
+        timeEstimate.className = 'time-estimate';
+        timeEstimate.textContent = config.estimatedTime;
+      }
+
+      // Add status badge if available
+      if (config.status && config.status !== 'ready') {
+        statusBadge = document.createElement('span');
+        statusBadge.className = `activity-status activity-status-${config.status}`;
+        statusBadge.textContent = config.status.charAt(0).toUpperCase() + config.status.slice(1);
+      }
+
+      isCompleted = config.isCompleted;
+      onClick = config.onClick;
+
+    } else {
+      // Old positional API for backward compatibility
+      const activity = activityOrConfig;
+      item.setAttribute('data-activity-id', activity.id);
+
+      // Create link
+      link = document.createElement('a');
+      link.href = `${basePath}${type}/${activity.id}/`;
+      link.textContent = activity.title;
+      link.className = 'activity-link';
+
+      // Add time estimate
+      if (activity.estimatedTime) {
+        timeEstimate = document.createElement('span');
+        timeEstimate.className = 'time-estimate';
+        timeEstimate.textContent = activity.estimatedTime;
+      }
+
+      // Add status badge if available
+      if (activity.status && activity.status !== 'ready') {
+        statusBadge = document.createElement('span');
+        statusBadge.className = `activity-status activity-status-${activity.status}`;
+        statusBadge.textContent = activity.status.charAt(0).toUpperCase() + activity.status.slice(1);
+      }
+
+      // Check completion via progress tracker
+      isCompleted = progressTracker && progressTracker.isComplete(type, activity.id);
     }
 
-    // Add completion indicator if progress tracker is provided
-    if (progressTracker && progressTracker.isComplete(type, activity.id)) {
+    // Add completion indicator if complete
+    if (isCompleted) {
       const checkmark = document.createElement('span');
       checkmark.className = 'completion-indicator';
       checkmark.innerHTML = '✓';
-      checkmark.style.color = 'var(--color-success)';
-      checkmark.style.marginLeft = 'var(--space-2)';
-      checkmark.style.fontWeight = 'bold';
+      checkmark.setAttribute('aria-label', 'Completed');
+      item.classList.add('completed');
       item.appendChild(checkmark);
     }
 
+    // Add status badge if present
+    if (statusBadge) {
+      item.appendChild(statusBadge);
+    }
+
     item.appendChild(link);
-    item.appendChild(timeEstimate);
+
+    if (timeEstimate) {
+      item.appendChild(timeEstimate);
+    }
+
+    // Add click handler if provided
+    if (onClick) {
+      link.addEventListener('click', onClick);
+    }
 
     return item;
   }
